@@ -1,5 +1,18 @@
 # Agent Instructions
 
+This repository contains protobuf contracts for Coherence.
+
+## Rules
+
+- `coherence.kernel.v1` is the minimal runtime contract.
+- `coherence.core.v1` is a bundled first-party extension.
+- Kernel protobuf files must not import core protobuf files.
+- Object kinds are data, not protobuf enums.
+- New object kinds should be registered through `ObjectKindDefinition` records/seeds.
+- Breaking protobuf changes require a new package version, e.g. `v2`.
+
+## Beads
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 ## Quick Reference
