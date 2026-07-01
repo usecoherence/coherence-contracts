@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "coherence_contracts",
+  "project_id": "1a01de59-5562-431a-a576-4ed242d8276c"
+}
