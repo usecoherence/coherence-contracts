@@ -16,7 +16,7 @@ func validSpec() *checktest.CheckTest {
 			},
 		},
 		Spec: &check.Spec{
-			rules: []*check.rulespec{kernelImportsRuleSpec},
+			Rules: []*check.RuleSpec{KernelImportsRuleSpec},
 		},
 		ExpectedAnnotations: nil,
 	}

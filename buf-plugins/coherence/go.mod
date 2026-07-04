@@ -2,7 +2,10 @@ module github.com/usecoherence/coherence-contracts/buf-plugins/coherence
 
 go 1.25.0
 
-require buf.build/go/bufplugin v0.10.0
+require (
+	buf.build/go/bufplugin v0.10.0
+	google.golang.org/protobuf v1.36.11
+)
 
 require (
 	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.11-20250718181942-e35f9b667443.1 // indirect
@@ -25,7 +28,6 @@ require (
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250811230008-5f3141c8851a // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect
 )
