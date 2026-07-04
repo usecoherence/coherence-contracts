@@ -1,9 +1,10 @@
 PROTO_DIR ?= proto
 TOOL ?= coherence-contracts-tools
 BUF_PLUGIN_DIR ?= buf-plugins/coherence
+BUF_PLUGIN_NAME ?= buf-plugin-coherence
 
 .PHONY: check check-contracts check-buf inventory graph cargo-check fmt clean
-.PHONY: go-check go-test go-lint go-build
+.PHONY: go-check go-test go-lint go-build go-install
 
 check: fmt cargo-check go-check check-contracts check-buf
 
@@ -26,7 +27,10 @@ check-buf:
 go-check: go-build go-test go-lint
 
 go-build:
-	cd $(BUF_PLUGIN_DIR) && go build ./...
+	cd $(BUF_PLUGIN_DIR) && go build -o $(BUF_PLUGIN_NAME) .
+
+go-install: go-build
+	mv $(BUF_PLUGIN_DIR)/$(BUF_PLUGIN_NAME) $(HOME)/.local/bin/
 
 go-test:
 	cd $(BUF_PLUGIN_DIR) && go test ./...
