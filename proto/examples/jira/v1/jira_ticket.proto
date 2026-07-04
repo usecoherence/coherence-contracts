@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package examples.jira.v1;
+
+// Example third-party extension object representing an issue tracker ticket.
+//
+// This message demonstrates how an integration can register a new object kind
+// such as "jira.ticket" without changing the Coherence kernel or core protobuf
+// packages.
+message JiraTicket {
+  // External Jira issue key, e.g. "PROJ-123".
+  string key = 1;
+
+  // Human-readable issue title.
+  string title = 2;
+
+  // External workflow status copied from Jira, e.g. "To Do", "In Progress", or
+  // "Done".
+  string status = 3;
+
+  // Browser URL for the ticket.
+  string url = 4;
+}

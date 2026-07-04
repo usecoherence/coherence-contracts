@@ -1,0 +1,1 @@
+{"kind_id": "examples.jira.ticket", "namespace": "examples.jira", "slug": "ticket", "display_name": "Jira Ticket", "proto_type_url": "type.googleapis.com/examples.jira.v1.JiraTicket", "owner_extension_id": "examples-jira", "schema_version": "v1", "built_in": false, "extension_owned": true}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// First-party Coherence object representing an intended outcome.
+//
+// A Spec is not source code and not a test. It is the human-readable outcome or
+// design intent that acceptance criteria, behaviors, evidence, and code links
+// trace back to.
+message Spec {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Position of the spec in the outcome hierarchy.
+  //
+  // Expected values in v1: "product", "system", "module", "component",
+  // "foundation". Kept as a string so the bundled core extension can evolve
+  // without changing the kernel.
+  string level = 2;
+
+  // Optional parent spec id for tree rendering and decomposition.
+  //
+  // Generic containment can also be represented by a Link, but this field keeps
+  // the common spec tree cheap to query and display.
+  string parent_spec_id = 3;
+
+  // Human or tool-assigned labels for filtering, search, and reports.
+  repeated string tags = 10;
+}

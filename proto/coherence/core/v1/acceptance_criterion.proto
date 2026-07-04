@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// First-party Coherence object representing one acceptance criterion.
+//
+// An acceptance criterion is a human-facing assertion about what must be true
+// for a spec/outcome. It can describe one or more structured behaviors and can
+// be verified by code locations, tests, commands, or manual evidence through
+// generic links.
+message AcceptanceCriterion {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Stable id of the owning spec/outcome.
+  string spec_id = 2;
+
+  // Human-readable intent statement explaining the expected truth and why it
+  // matters.
+  string intent = 3;
+
+  // How this AC is reviewed or verified.
+  //
+  // Expected values in v1: "manual", "automated", "hybrid".
+  string review_mode = 4;
+
+  // Risk level used for prioritization and reporting.
+  //
+  // Expected values in v1: "low", "medium", "high", "critical".
+  string risk_level = 5;
+
+  // Concern tags covered by this AC.
+  //
+  // Expected values include "correctness", "security", "performance",
+  // "reliability", "maintainability", "usability", "accessibility", and
+  // "observability".
+  repeated string concerns = 10;
+}

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// Structured scenario that explains how the modeled system changes.
+//
+// Behaviors sit between acceptance criteria and the domain model. An AC says
+// what must be true; a Behavior describes the given/when/then state transition
+// using entities, attributes, states, transitions, links, and evidence.
+message Behavior {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Optional owning spec id.
+  //
+  // The canonical relationship can also be expressed as a Link. This field is a
+  // convenience for common authoring and migration paths.
+  string spec_id = 2;
+
+  // Optional AC id that this behavior helps describe.
+  //
+  // Multiple ACs may eventually point to the same behavior through Links, so
+  // this field should be treated as a convenience, not the only relationship.
+  string acceptance_criterion_id = 3;
+
+  // Actor initiating the behavior, e.g. "author", "admin", "system", or
+  // "scheduler".
+  string actor = 4;
+
+  // Preconditions or world facts before the behavior starts.
+  repeated BehaviorStep given = 10;
+
+  // Actions, triggers, or events that cause the behavior.
+  repeated BehaviorStep when = 11;
+
+  // Expected world facts after the behavior completes.
+  repeated BehaviorStep then = 12;
+
+  // Human-readable scenario narrative for docs and non-engineer review.
+  string narrative = 20;
+}
+
+// One structured step in a behavior scenario.
+message BehaviorStep {
+  // Stable id of the step within the behavior.
+  string id = 1;
+
+  // Step category, e.g. "fact", "action", "expectation", "state_assertion",
+  // "attribute_assertion", or "link_assertion".
+  string step_kind = 2;
+
+  // Human-readable step text.
+  string text = 3;
+
+  // Optional machine-readable predicate or expression.
+  //
+  // Kept as a string in v1. A later version can replace this with an expression
+  // AST after the language stabilizes.
+  string expr = 4;
+
+  // Domain objects referenced by this step.
+  repeated coherence.kernel.v1.ObjectRef refs = 10;
+}

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package coherence.kernel.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// Request to validate one object or link operation.
+//
+// Validators are extension-owned. The kernel routes the request based on object
+// kind, link kind, and operation, then stores or reports ValidationResult.
+message ValidationRequest {
+  // Object being validated.
+  ObjectRef subject = 1;
+
+  // Operation being attempted, e.g. "insert", "update", "delete", "link", or
+  // "import".
+  string operation = 2;
+
+  // Caller-provided context such as branch name, actor id, source file, or
+  // migration id.
+  map<string, string> context = 10;
+}
+
+// One validation finding produced by a validator.
+message ValidationIssue {
+  // Stable issue id for this validation result.
+  string id = 1;
+
+  // Object that the issue is about.
+  ObjectRef subject = 2;
+
+  // Severity string, e.g. "info", "warning", "error", or "critical".
+  string severity = 3;
+
+  // Machine-readable validator code, e.g. "required_field_missing".
+  string code = 4;
+
+  // Human-readable explanation of the problem.
+  string message = 5;
+
+  // Optional structured metadata for UI and debugging.
+  map<string, string> annotations = 10;
+}
+
+// Result of validating one operation.
+message ValidationResult {
+  // True when the operation is valid and can be committed.
+  bool valid = 1;
+
+  // Validation findings. Empty when valid is true unless validators emit info
+  // or warning messages.
+  repeated ValidationIssue issues = 2;
+}

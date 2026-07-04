@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package coherence.kernel.v1;
+
+import "coherence/kernel/v1/common.proto";
+import "google/protobuf/any.proto";
+
+// Registry entry describing one object kind supported by an extension.
+//
+// The kernel does not hardcode domain object enums. Instead, extensions register
+// object kinds such as "coherence.spec", "coherence.behavior", or
+// "jira.ticket". The registry connects a stable kind id to the protobuf payload
+// type that validators and import/export tools should expect.
+message ObjectKindDefinition {
+  // Stable registry id, usually namespaced as "owner.slug".
+  //
+  // Examples: "coherence.spec", "coherence.acceptance_criterion",
+  // "jira.ticket".
+  string kind_id = 1;
+
+  // Namespace that owns the kind, e.g. "coherence" or "jira".
+  string namespace = 2;
+
+  // Short local name inside the namespace, e.g. "spec" or "ticket".
+  string slug = 3;
+
+  // Human-readable name for UI, docs, and generated reports.
+  string display_name = 4;
+
+  // Protobuf Any type URL for this kind's payload message.
+  //
+  // Example: "type.googleapis.com/coherence.core.v1.Spec".
+  // Validators use this to unpack ObjectRecord.payload and confirm that the
+  // payload matches `kind_id`.
+  string proto_type_url = 10;
+
+  // Extension that owns this kind, e.g. "coherence-core" or "jira".
+  string owner_extension_id = 11;
+
+  // Schema version string for this object kind definition.
+  //
+  // This is extension-defined. A simple value like "v1" is enough for early
+  // versions; semver can be used later if needed.
+  string schema_version = 12;
+
+  // True when the kind is shipped with the Coherence distribution.
+  //
+  // Built-in does not mean special-cased by the kernel. It only affects seed
+  // installation and user-facing labeling.
+  bool built_in = 20;
+
+  // True when the kind is owned by an extension rather than ad-hoc local data.
+  bool extension_owned = 21;
+
+  // Optional metadata for tooling, UI, or generators.
+  map<string, string> annotations = 30;
+}
+
+// Generic persisted object envelope.
+//
+// ObjectRecord is the storage and import/export wrapper for all object kinds.
+// The kernel owns the envelope. Extensions own the typed protobuf payload packed
+// in `payload`.
+message ObjectRecord {
+  // Reference containing the record kind and stable id.
+  ObjectRef ref = 1;
+
+  // Common identity, display, lifecycle, and timestamp metadata.
+  RecordMeta meta = 2;
+
+  // Typed extension payload packed using protobuf Any.
+  //
+  // The payload type must match the `proto_type_url` registered for
+  // `ref.kind_id` in ObjectKindDefinition.
+  google.protobuf.Any payload = 10;
+}
+
+// Manifest published by an extension.
+//
+// The manifest is used to seed object kind registries, generate migrations,
+// register validators, and build graph projections. The bundled Coherence core
+// model is represented as a first-party extension using the same mechanism as
+// third-party integrations.
+message ExtensionManifest {
+  // Stable extension id, e.g. "coherence-core" or "jira".
+  string extension_id = 1;
+
+  // Human-readable extension name.
+  string display_name = 2;
+
+  // Extension version that produced this manifest.
+  string version = 3;
+
+  // Object kinds registered by the extension.
+  repeated ObjectKindDefinition object_kinds = 10;
+}

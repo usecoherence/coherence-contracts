@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+// Historical verification run for an acceptance criterion or verification link.
+//
+// Runs are evidence-producing events. They can be persisted as canonical objects
+// or stored externally and summarized in latest-status projections, depending on
+// repository policy.
+message VerificationRun {
+  // Stable id of this run.
+  string id = 1;
+
+  // AC that was verified by this run.
+  string acceptance_criterion_id = 2;
+
+  // Optional link id when this run verifies a specific AC-to-code/evidence link.
+  string link_id = 3;
+
+  // Run status, e.g. "pass", "fail", "skip", "error", or "unknown".
+  string status = 4;
+
+  // Command that produced this verification result.
+  string command = 5;
+
+  // Process exit code when command execution happened.
+  int32 exit_code = 6;
+
+  // Short stdout summary safe to show in CLI/TUI.
+  string stdout_summary = 7;
+
+  // Short stderr summary safe to show in CLI/TUI.
+  string stderr_summary = 8;
+
+  // URI or path to full output.
+  string output_uri = 9;
+
+  // Start time as Unix seconds.
+  int64 started_at_unix_s = 10;
+
+  // Finish time as Unix seconds.
+  int64 finished_at_unix_s = 11;
+
+  // Optional metadata such as runner, branch, commit, or environment.
+  map<string, string> annotations = 20;
+}
+
+// Compact latest verification status for one acceptance criterion.
+//
+// This is a cache/projection for fast CLI and TUI reporting. Historical evidence
+// should be represented by VerificationRun and/or Evidence records.
+message AcceptanceCriterionVerificationLatest {
+  // AC whose latest status is summarized.
+  string acceptance_criterion_id = 1;
+
+  // Latest overall status, e.g. "pass", "fail", "skip", "error", or
+  // "unknown".
+  string status = 2;
+
+  // Last update time as Unix seconds.
+  int64 updated_at_unix_s = 3;
+
+  // Optional latest run id that produced this summary.
+  string latest_run_id = 4;
+
+  // Human-readable status summary.
+  string summary = 5;
+}
+
+// Compact latest verification status for one verification link.
+//
+// This is a cache/projection keyed by Link.id. It replaces older latest-status
+// tables keyed by AC id and code location id.
+message LinkVerificationLatest {
+  // Link whose latest verification status is summarized.
+  string link_id = 1;
+
+  // Latest link status, e.g. "pass", "fail", "skip", "error", or "unknown".
+  string status = 2;
+
+  // Last update time as Unix seconds.
+  int64 updated_at_unix_s = 3;
+
+  // Optional latest run id that produced this summary.
+  string latest_run_id = 4;
+
+  // Human-readable status summary.
+  string summary = 5;
+}

@@ -1,0 +1,25 @@
+digraph imports {
+  rankdir=LR;
+  "coherence/core/v1/acceptance_criterion.proto";
+  "coherence/core/v1/acceptance_criterion.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/core/v1/behavior.proto";
+  "coherence/core/v1/behavior.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/core/v1/domain_model.proto";
+  "coherence/core/v1/domain_model.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/core/v1/evidence.proto";
+  "coherence/core/v1/evidence.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/core/v1/extension_manifest.proto";
+  "coherence/core/v1/extension_manifest.proto" -> "coherence/kernel/v1/object.proto";
+  "coherence/core/v1/spec.proto";
+  "coherence/core/v1/spec.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/core/v1/verification.proto";
+  "coherence/kernel/v1/common.proto";
+  "coherence/kernel/v1/link.proto";
+  "coherence/kernel/v1/link.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/kernel/v1/object.proto";
+  "coherence/kernel/v1/object.proto" -> "coherence/kernel/v1/common.proto";
+  "coherence/kernel/v1/object.proto" -> "google/protobuf/any.proto";
+  "coherence/kernel/v1/validation.proto";
+  "coherence/kernel/v1/validation.proto" -> "coherence/kernel/v1/common.proto";
+  "examples/jira/v1/jira_ticket.proto";
+}

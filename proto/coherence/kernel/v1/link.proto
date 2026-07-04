@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package coherence.kernel.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// Registry entry describing one semantic link kind.
+//
+// Link kinds are registry-backed for the same reason object kinds are: Coherence
+// ships useful defaults, but integrations must be able to add their own relation
+// vocabulary without changing the kernel protobuf schema.
+message LinkKindDefinition {
+  // Stable registry id for the relation kind.
+  //
+  // Examples: "coherence.has_ac", "coherence.describes",
+  // "coherence.verified_by", "jira.tracks".
+  string kind_id = 1;
+
+  // Namespace that owns the relation kind.
+  string namespace = 2;
+
+  // Short local name inside the namespace.
+  string slug = 3;
+
+  // Human-readable relation name for UI and docs.
+  string display_name = 4;
+
+  // Extension that owns this link kind.
+  string owner_extension_id = 5;
+
+  // Optional metadata for generators and UI.
+  map<string, string> annotations = 20;
+}
+
+// Directed semantic edge between two Coherence objects.
+//
+// Links replace specialized edge tables such as spec_relations and AC-to-code
+// links. The edge is typed by `kind_id`; both endpoints are generic ObjectRef
+// values so links can connect core objects and extension objects uniformly.
+message Link {
+  // Stable id of the link itself.
+  //
+  // This id is important because verification, evidence, and audit history may
+  // refer to a specific edge, not just to the two endpoint objects.
+  string id = 1;
+
+  // Source object of the directed relation.
+  ObjectRef source = 2;
+
+  // Registry id of the link kind, e.g. "coherence.verified_by".
+  string kind_id = 3;
+
+  // Target object of the directed relation.
+  ObjectRef target = 4;
+
+  // Optional short label for the link.
+  string title = 10;
+
+  // Human explanation for why this link exists.
+  //
+  // This replaces old free-text fields like `note` while keeping the intent of
+  // the relation visible to humans.
+  string rationale = 11;
+
+  // Confidence score for inferred or agent-suggested links.
+  //
+  // Use 1.0 for explicitly authored links. Use 0.0 when confidence is unknown.
+  double confidence = 12;
+
+  // Creation time as Unix seconds.
+  int64 created_at_unix_s = 20;
+
+  // Last update time as Unix seconds.
+  int64 updated_at_unix_s = 21;
+
+  // Optional metadata for tools, importers, and projections.
+  map<string, string> annotations = 30;
+}

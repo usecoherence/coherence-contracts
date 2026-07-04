@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package coherence.kernel.v1;
+
+// Shared metadata for records managed by Coherence.
+//
+// This metadata is intentionally generic so it can be reused by the kernel,
+// the bundled core extension, and third-party extensions. The payload-specific
+// message owns domain fields; RecordMeta owns identity, display text, lifecycle,
+// timestamps, and open-ended annotations.
+message RecordMeta {
+  // Stable storage id for the record within its object kind.
+  //
+  // This value is the primary identity used by links, migrations, import/export,
+  // and generated tables. It should not change when a human-facing slug changes.
+  string id = 1;
+
+  // Human-readable identifier for URLs, CLI output, and authoring surfaces.
+  //
+  // Slugs are expected to be stable enough for humans but are not the canonical
+  // identity. Use `id` for immutable references.
+  string slug = 2;
+
+  // Short human-readable name shown in TUI, docs, review screens, and generated
+  // graph labels.
+  string title = 3;
+
+  // Longer explanation of the record's purpose, intent, or domain meaning.
+  string description = 4;
+
+  // Lifecycle status of the record, e.g. "draft", "active", "deprecated", or
+  // "archived".
+  //
+  // Kept as a string in v1 so extensions can evolve status vocabularies without
+  // changing the kernel protobuf package.
+  string lifecycle_status = 5;
+
+  // Creation time as Unix seconds.
+  //
+  // The database may store its own raw timestamp format, but protobuf contracts
+  // use Unix seconds for language-neutral import/export.
+  int64 created_at_unix_s = 10;
+
+  // Last update time as Unix seconds.
+  int64 updated_at_unix_s = 11;
+
+  // Extension-specific or generator-specific metadata that should travel with
+  // the record but is not part of the stable semantic model.
+  //
+  // Examples: "ui.color", "source.file", "generated_by".
+  map<string, string> annotations = 20;
+}
+
+// Stable reference to any object known by Coherence.
+//
+// ObjectRef is the kernel-level pointer used by links, validation issues,
+// evidence, graph projections, and extension payloads. The referenced kind must
+// be registered in the object kind registry.
+message ObjectRef {
+  // Registry id of the object kind, e.g. "coherence.spec" or "jira.ticket".
+  string kind_id = 1;
+
+  // Stable object id within `kind_id`.
+  string id = 2;
+
+  // Optional human-readable slug copied for display and diagnostics.
+  //
+  // Readers must not use this as canonical identity because slugs may change.
+  string slug = 3;
+}

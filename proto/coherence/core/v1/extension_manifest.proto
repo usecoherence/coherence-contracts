@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/object.proto";
+
+// Wrapper for the bundled Coherence core extension manifest.
+//
+// Core is modeled as a first-party extension, not as special kernel logic. This
+// keeps the same registry, migration, validation, and projection mechanics for
+// core objects and third-party integrations.
+message CoreExtensionManifest {
+  // Extension manifest registering the core object kinds owned by
+  // "coherence-core".
+  coherence.kernel.v1.ExtensionManifest manifest = 1;
+}

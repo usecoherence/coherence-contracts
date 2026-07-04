@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// Domain object type used by behaviors and state models.
+//
+// Entity is a conceptual type in the modeled system, not necessarily a database
+// table or code class. Examples: "spec", "acceptance_criterion", "user",
+// "payment", "deployment".
+message Entity {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Human domain namespace, e.g. "coherence.specs".
+  string namespace = 2;
+
+  // Non-engineer-facing name shown in diagrams and state cards.
+  string display_name = 3;
+}
+
+// Attribute belonging to a domain entity.
+//
+// Attributes define the shape of the modeled world. They can be used by states,
+// guards, effects, invariants, generated migrations, and validation rules.
+message Attribute {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Stable id of the entity that owns this attribute.
+  string entity_id = 2;
+
+  // Attribute name inside the entity, e.g. "slug", "level", or "status".
+  string name = 3;
+
+  // Primitive value category.
+  //
+  // Expected values in v1: "string", "integer", "float", "boolean", "enum",
+  // "timestamp", "json", "ref".
+  string value_type = 4;
+
+  // Optional named type for enums, refs, or custom scalar conventions.
+  //
+  // Examples: "SpecLevel", "LifecycleStatus", "coherence.spec".
+  string type_name = 5;
+
+  // True when this attribute participates in the entity identity.
+  bool identity = 10;
+
+  // True when a valid instance must provide this attribute.
+  bool required = 11;
+
+  // Uniqueness rule for the attribute.
+  //
+  // Expected values in v1: "none", "global", "within_entity", "within_parent".
+  string unique_scope = 12;
+
+  // Default value expression used when the attribute is omitted.
+  //
+  // Examples: "draft", "module", "now()".
+  string default_value = 13;
+
+  // Allowed values when value_type is "enum".
+  repeated string enum_values = 20;
+
+  // Optional metadata for generators and UI.
+  map<string, string> annotations = 30;
+}
+
+// Named state of an entity.
+//
+// A state may be stored directly in an attribute or derived from a predicate over
+// attributes and relationships. States are the vocabulary used by behaviors,
+// transitions, diagrams, and non-engineer review surfaces.
+message State {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Stable id of the entity that owns this state.
+  string entity_id = 2;
+
+  // State implementation kind.
+  //
+  // Expected values in v1: "stored" or "derived".
+  string state_kind = 3;
+
+  // Attribute id used when state_kind is "stored".
+  string stored_attribute_id = 4;
+
+  // Attribute value that means this state is active when state_kind is "stored".
+  string stored_value = 5;
+
+  // Predicate expression used when state_kind is "derived".
+  //
+  // Kept as a string in v1 until the expression language stabilizes.
+  string predicate = 6;
+
+  // Human explanation of what this state means in the domain.
+  string meaning = 10;
+}
+
+// Allowed change in the modeled world.
+//
+// A transition describes what can happen to an entity: from which states, into
+// which states, under which guards, with which effects, while preserving which
+// facts.
+message Transition {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Stable id of the entity affected by the transition.
+  string entity_id = 2;
+
+  // Transition category, e.g. "create", "update", "approve", "reject",
+  // "archive", "retry", "rollback", or "custom".
+  string transition_kind = 3;
+
+  // Action, event, or command that triggers the transition.
+  //
+  // Examples: "create_spec", "approve_spec", "change_slug".
+  string trigger = 4;
+
+  // States from which this transition may start. Empty means any state.
+  repeated string from_state_ids = 10;
+
+  // States expected after this transition. Empty means the transition does not
+  // change the named state or the target state is expressed by effects.
+  repeated string to_state_ids = 11;
+
+  // Conditions that must hold before the transition can apply.
+  repeated TransitionGuard guards = 20;
+
+  // Changes caused by the transition.
+  repeated TransitionEffect effects = 21;
+
+  // Facts that must remain unchanged by the transition.
+  repeated TransitionPreserve preserves = 22;
+
+  // Event names emitted by the transition, if any.
+  repeated string emitted_event_names = 30;
+}
+
+// Condition required before a transition can apply.
+message TransitionGuard {
+  // Stable guard id within the transition.
+  string id = 1;
+
+  // Human-readable guard title.
+  string title = 2;
+
+  // Machine-readable guard predicate.
+  //
+  // Kept as a string in v1 until the expression language stabilizes.
+  string predicate = 3;
+
+  // Message shown when the guard fails.
+  string failure_message = 4;
+}
+
+// One effect produced by a transition.
+message TransitionEffect {
+  // Stable effect id within the transition.
+  string id = 1;
+
+  // Effect category, e.g. "set_attribute", "create_object", "delete_object",
+  // "create_link", "delete_link", or "emit_event".
+  string effect_kind = 2;
+
+  // Object affected by the effect.
+  coherence.kernel.v1.ObjectRef target = 3;
+
+  // Attribute affected when effect_kind is "set_attribute".
+  string attribute_id = 4;
+
+  // Expression describing the value assigned or produced by the effect.
+  //
+  // Examples: "input.new_slug", "module", "now()".
+  string value_expr = 5;
+
+  // Human-readable explanation of the effect.
+  string description = 10;
+}
+
+// Fact that a transition must preserve.
+message TransitionPreserve {
+  // Stable preserve-rule id within the transition.
+  string id = 1;
+
+  // Object whose attributes or identity must be preserved.
+  coherence.kernel.v1.ObjectRef target = 2;
+
+  // Attribute ids that must not change.
+  repeated string attribute_ids = 3;
+
+  // Human explanation for why preservation matters.
+  string rationale = 10;
+}
+
+// Rule that should always hold for an object, model, or relationship.
+//
+// Invariants are stronger than behavior examples: they describe truths that must
+// remain valid across all applicable transitions.
+message Invariant {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Object, entity, state, transition, or link that this invariant applies to.
+  coherence.kernel.v1.ObjectRef applies_to = 2;
+
+  // Human-readable rule statement.
+  string rule = 3;
+
+  // Machine-readable predicate for validators or simulators.
+  //
+  // Kept as a string in v1 until the expression language stabilizes.
+  string predicate = 4;
+
+  // Severity when the invariant is violated, e.g. "warning", "error", or
+  // "critical".
+  string severity = 5;
+}

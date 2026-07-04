@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package coherence.core.v1;
+
+import "coherence/kernel/v1/common.proto";
+
+// First-party Coherence object pointing to code or executable verification.
+//
+// CodeLocation is intentionally broader than a source file line range. It can
+// represent a file, symbol, endpoint, table, test command, or a manual gap that
+// still needs implementation.
+message CodeLocation {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Location category, e.g. "file", "symbol", "test_file", "test_command",
+  // "table", "endpoint", or "manual_gap".
+  string location_kind = 2;
+
+  // Repository-relative path or logical path.
+  string path = 3;
+
+  // Optional symbol name, route, table name, or other nested locator.
+  string symbol = 4;
+
+  // Optional starting line for source-backed locations.
+  int32 start_line = 5;
+
+  // Optional ending line for source-backed locations.
+  int32 end_line = 6;
+
+  // Command used when this location represents executable verification.
+  string test_command = 7;
+
+  // Optional metadata such as repository root, language, package, or tool name.
+  map<string, string> annotations = 20;
+}
+
+// Evidence that supports, verifies, or explains a semantic object or link.
+//
+// Evidence can be produced by tests, commands, logs, commits, pull requests,
+// human approvals, screenshots, or manual notes. It is linked to specs, ACs,
+// behaviors, code locations, transitions, or links through ObjectRef and Link.
+message Evidence {
+  // Common identity, display, lifecycle, and timestamp metadata.
+  coherence.kernel.v1.RecordMeta meta = 1;
+
+  // Evidence category, e.g. "test_result", "command_output", "log",
+  // "screenshot", "human_approval", "pr", "commit", or "manual_note".
+  string evidence_kind = 2;
+
+  // Object this evidence is about.
+  coherence.kernel.v1.ObjectRef subject = 3;
+
+  // URI or path to the evidence payload.
+  //
+  // Examples: ".coherence/runs/...", "git:commit:<sha>", "https://...".
+  string uri = 4;
+
+  // Human-readable summary of what the evidence shows.
+  string summary = 5;
+
+  // Optional metadata for renderers, importers, or validators.
+  map<string, string> annotations = 20;
+}
