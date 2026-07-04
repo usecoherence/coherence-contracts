@@ -1,9 +1,11 @@
 PROTO_DIR ?= proto
 TOOL ?= coherence-contracts-tools
+BUF_PLUGIN_DIR ?= buf-plugins/coherence
 
 .PHONY: check check-contracts check-buf inventory graph cargo-check fmt clean
+.PHONY: go-check go-test go-lint go-build
 
-check: fmt cargo-check check-contracts check-buf
+check: fmt cargo-check go-check check-contracts check-buf
 
 fmt:
 	cargo fmt --all --check
@@ -19,6 +21,22 @@ check-buf:
 		buf lint; \
 	else \
 		echo "buf not installed; skipping buf lint"; \
+	fi
+
+go-check: go-build go-test go-lint
+
+go-build:
+	cd $(BUF_PLUGIN_DIR) && go build ./...
+
+go-test:
+	cd $(BUF_PLUGIN_DIR) && go test ./...
+
+go-lint:
+	@lint=$$(command -v golangci-lint 2>/dev/null || echo "$(HOME)/.local/share/nvim/mason/bin/golangci-lint"); \
+	if [ -x "$$lint" ]; then \
+		"$$lint" run ./$(BUF_PLUGIN_DIR)/...; \
+	else \
+		echo "golangci-lint not installed; skipping"; \
 	fi
 
 inventory:
