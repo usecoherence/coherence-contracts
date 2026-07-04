@@ -11,12 +11,12 @@ func validSpec() *checktest.CheckTest {
 	return &checktest.CheckTest{
 		Request: &checktest.RequestSpec{
 			Files: &checktest.ProtoFileSpec{
-				DirPaths:  []string{"testdata/valid"},
+				DirPaths:  []string{"testdata/kernel_imports/valid"},
 				FilePaths: []string{"coherence/kernel/v1/kernel_valid.proto"},
 			},
 		},
 		Spec: &check.Spec{
-			Rules: []*check.RuleSpec{KernelImportsRuleSpec},
+			rules: []*check.rulespec{kernelImportsRuleSpec},
 		},
 		ExpectedAnnotations: nil,
 	}
@@ -26,7 +26,7 @@ func invalidSpec() *checktest.CheckTest {
 	return &checktest.CheckTest{
 		Request: &checktest.RequestSpec{
 			Files: &checktest.ProtoFileSpec{
-				DirPaths:  []string{"testdata/invalid"},
+				DirPaths:  []string{"testdata/kernel_imports/invalid"},
 				FilePaths: []string{"coherence/kernel/v1/kernel_bad_import.proto"},
 			},
 		},
@@ -44,12 +44,12 @@ func invalidSpec() *checktest.CheckTest {
 	}
 }
 
-func TestKernelImportsValid(t *testing.T) {
+func TestKernelImports_Valid(t *testing.T) {
 	t.Parallel()
 	validSpec().Run(t)
 }
 
-func TestKernelImportsInvalid(t *testing.T) {
+func TestKernelImports_Invalid(t *testing.T) {
 	t.Parallel()
 	invalidSpec().Run(t)
 }
