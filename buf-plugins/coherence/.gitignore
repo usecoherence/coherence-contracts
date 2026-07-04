@@ -1,1 +1,3 @@
-buf-plugins/coherence/coherence-plugin
+coherence
+coherence-plugin
+buf-plugin-coherence*

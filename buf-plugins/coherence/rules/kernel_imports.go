@@ -1,22 +1,57 @@
+// Package rules contains custom Buf lint rules for Coherence protobuf contracts.
 package rules
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"buf.build/go/bufplugin/check"
 	"buf.build/go/bufplugin/check/checkutil"
 	"buf.build/go/bufplugin/descriptor"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-const KernelImportsRuleID = "COHERENCE_KERNEL_IMPORTS"
+const (
+	KernelImportsRuleID = "COHERENCE_KERNEL_IMPORTS"
 
-var KernelImportsRuleSpec = &check.RuleSpec{
-	ID:      KernelImportsRuleID,
-	Default: true,
-	Purpose: "Checks that files in coherence/kernel/ only import coherence/kernel/ or google/protobuf/.",
-	Type:    check.RuleTypeLint,
-	Handler: checkutil.NewFileRuleHandler(checkKernelImports, checkutil.WithoutImports()),
+	kernelPrefix       = "coherence/kernel/"
+	googleProtoPrefix  = "google/protobuf/"
+)
+
+var (
+	allowedKernelImportPrefixes = []string{
+		kernelPrefix,
+		googleProtoPrefix,
+	}
+
+	allowedKernelImportsText = strings.Join(allowedKernelImportPrefixes, ", ")
+	kernelPathText           = strings.TrimSuffix(kernelPrefix, "/")
+
+	KernelImportsRuleSpec = &check.RuleSpec{
+		ID:      KernelImportsRuleID,
+		Default: true,
+		Type:    check.RuleTypeLint,
+		Purpose: "Checks that files in " + kernelPathText + " only import " + allowedKernelImportsText + ".",
+		Handler: checkutil.NewFileRuleHandler(checkKernelImports, checkutil.WithoutImports()),
+	}
+)
+
+func isAllowedKernelImport(s string) bool {
+	return slices.ContainsFunc(allowedKernelImportPrefixes, func(p string) bool {
+		return strings.HasPrefix(s, p)
+	})
+}
+
+func invalidImportPaths(imports protoreflect.FileImports) []string {
+	var paths []string
+	for i := 0; i < imports.Len(); i++ {
+		path := imports.Get(i).Path()
+		if !isAllowedKernelImport(path) {
+			paths = append(paths, path)
+		}
+	}
+	return paths
 }
 
 func checkKernelImports(
@@ -26,23 +61,17 @@ func checkKernelImports(
 	fileDescriptor descriptor.FileDescriptor,
 ) error {
 	filePath := fileDescriptor.ProtoreflectFileDescriptor().Path()
-	if !strings.HasPrefix(filePath, "coherence/kernel/") {
+	if !strings.HasPrefix(filePath, kernelPrefix) {
 		return nil
 	}
-	imports := fileDescriptor.ProtoreflectFileDescriptor().Imports()
-	for i := 0; i < imports.Len(); i++ {
-		importPath := imports.Get(i).Path()
-		if strings.HasPrefix(importPath, "coherence/kernel/") {
-			continue
-		}
-		if strings.HasPrefix(importPath, "google/protobuf/") {
-			continue
-		}
+	for _, importPath := range invalidImportPaths(fileDescriptor.ProtoreflectFileDescriptor().Imports()) {
 		responseWriter.AddAnnotation(
 			check.WithMessagef(
-				"File %q imports %q which is not allowed. Files in coherence/kernel/ may only import coherence/kernel/ or google/protobuf/.",
+				"File %q imports %q which is not allowed. Files in %s may only import %s.",
 				filePath,
 				importPath,
+				kernelPathText,
+				allowedKernelImportsText,
 			),
 			check.WithDescriptor(fileDescriptor.ProtoreflectFileDescriptor()),
 		)
