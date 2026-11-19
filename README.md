@@ -15,5 +15,9 @@ proto/coherence/core/v1     # bundled core extension: spec, AC, behavior, domain
 proto/examples/jira/v1      # example third-party extension object kind
 ```
 
+Design notes:
+
+- [Vertical slice: spec → AC → code → run → report](design/vertical-slice.html) — proposed minimal contract for the end-to-end path.
+
 The kernel only knows `ObjectKindDefinition`, `ObjectRef`, `ObjectRecord`, `Link`, and validation/manifest contracts.
 Core concepts like `Spec`, `AcceptanceCriterion`, and `Behavior` are just preinstalled extension payloads.
