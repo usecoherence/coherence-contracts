@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="alternate" hreflang="en" href="vertical-slice.html">
+<link rel="alternate" hreflang="ru" href="vertical-slice.ru.html">
+<title>Coherence — вертикальный слайс контракта</title>
+<style>
+  :root {
+    --paper: #f6f3ea;
+    --panel: #fbf9f2;
+    --ink: #20211c;
+    --muted: #6a6b60;
+    --faint: #8f9084;
+    --line: #d7d2c2;
+    --line-strong: #b9b3a0;
+    --accent: #b23a26;
+    --accent-soft: #f0dcd5;
+    --teal: #2c6a63;
+    --teal-soft: #dbe8e4;
+    --amber: #8a641f;
+    --amber-soft: #f0e5cc;
+    --code-bg: #efe9da;
+    --code-ink: #33342c;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --max: 1120px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14150f;
+      --panel: #1a1b13;
+      --ink: #e9e5d6;
+      --muted: #a0a091;
+      --faint: #7d7d70;
+      --line: #34342a;
+      --line-strong: #4a4a3c;
+      --accent: #e07a5f;
+      --accent-soft: #3a241d;
+      --teal: #7fc4ba;
+      --teal-soft: #1e3330;
+      --amber: #d6b26a;
+      --amber-soft: #332b18;
+      --code-bg: #1d1e15;
+      --code-ink: #ded9c8;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .skip {
+    position: absolute; left: -999px; top: 8px;
+    background: var(--ink); color: var(--paper);
+    padding: 8px 14px; border-radius: 3px; z-index: 100;
+  }
+  .skip:focus { left: 8px; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  /* ── rail ─────────────────────────────────────────────── */
+  .rail {
+    position: sticky; top: 0; align-self: start;
+    height: 100vh;
+    padding: 28px 22px 24px;
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 22px;
+    background: var(--paper);
+    z-index: 10;
+    min-width: 0;
+  }
+  .brand { display: flex; flex-direction: column; gap: 6px; }
+  .brand .mark {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .brand .name { font-family: var(--serif); font-size: 21px; line-height: 1.15; }
+  .brand .sub { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .lang-row {
+    display: flex; align-items: center; gap: 5px; margin-top: 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+  }
+  .lang-current {
+    color: var(--ink); border: 1px solid var(--line-strong);
+    background: var(--panel); padding: 1px 7px;
+  }
+  .lang {
+    color: var(--accent); text-decoration: none; padding: 1px 7px;
+    border: 1px solid transparent;
+  }
+  .lang:hover { border-color: var(--line-strong); background: var(--panel); }
+  .lang-sep { color: var(--faint); }
+
+  .rail nav { display: flex; flex-direction: column; gap: 2px; }
+  .rail nav button {
+    appearance: none; border: 0; background: transparent; color: var(--muted);
+    font: inherit; font-size: 13.5px; text-align: left;
+    padding: 7px 10px 7px 12px; border-left: 2px solid transparent;
+    cursor: pointer; display: flex; gap: 10px; align-items: baseline;
+    transition: color .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .rail nav button .num {
+    font-family: var(--mono); font-size: 10.5px; color: var(--faint);
+    min-width: 18px; letter-spacing: .04em;
+  }
+  .rail nav button:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 4%, transparent); }
+  .rail nav button[aria-selected="true"] {
+    color: var(--ink); border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .rail nav button[aria-selected="true"] .num { color: var(--accent); }
+
+  .rail-note {
+    margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 10.5px; line-height: 1.7; color: var(--faint);
+  }
+
+  /* ── main / pages ─────────────────────────────────────── */
+  main { min-width: 0; }
+  .page {
+    display: none;
+    max-width: var(--max);
+    padding: 52px 56px 96px;
+  }
+  .page.active { display: block; animation: pagein .18s ease both; }
+  @keyframes pagein {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .budget {
+    border: 1px solid var(--line-strong); color: var(--muted);
+    padding: 1px 7px; letter-spacing: .08em; white-space: nowrap;
+  }
+
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(30px, 4.2vw, 46px); line-height: 1.08;
+    letter-spacing: -.015em; margin: 0 0 18px; text-wrap: balance;
+  }
+  h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 24px; line-height: 1.2;
+    margin: 0 0 10px; letter-spacing: -.01em;
+  }
+  h3 {
+    font-family: var(--sans); font-weight: 650; font-size: 13px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .lede {
+    font-size: 18.5px; line-height: 1.55; color: var(--muted);
+    max-width: 68ch; margin: 0 0 26px; text-wrap: pretty;
+  }
+  p { max-width: 74ch; text-wrap: pretty; }
+  .small { font-size: 13.5px; color: var(--muted); }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; }
+  .chip {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .03em;
+    border: 1px solid var(--line-strong); padding: 3px 9px; color: var(--muted);
+    background: var(--panel); white-space: nowrap;
+  }
+  .chip.accent { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); color: var(--accent); background: var(--accent-soft); }
+  .chip.teal { border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); color: var(--teal); background: var(--teal-soft); }
+
+  section.block { margin: 38px 0 0; }
+  section.block + section.block { margin-top: 44px; }
+
+  /* ── pipeline diagram ─────────────────────────────────── */
+  .pipe {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    border: 1px solid var(--line-strong);
+    background: var(--panel);
+    margin: 6px 0 0;
+  }
+  .stage {
+    position: relative; padding: 18px 14px 20px; min-width: 0;
+    border-right: 1px solid var(--line);
+  }
+  .stage:last-child { border-right: 0; }
+  .stage::after {
+    content: "→";
+    position: absolute; right: -9px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 13px; color: var(--faint);
+    background: var(--panel); padding: 0 2px; z-index: 1;
+  }
+  .stage:last-child::after { display: none; }
+  .stage .s-num {
+    font-family: var(--mono); font-size: 10px; color: var(--accent);
+    letter-spacing: .1em; display: block; margin-bottom: 8px;
+  }
+  .stage .s-name { font-weight: 650; font-size: 14.5px; line-height: 1.25; display: block; }
+  .stage .s-what { font-size: 11.5px; color: var(--muted); line-height: 1.45; margin-top: 5px; display: block; }
+
+  .spine {
+    margin-top: 14px;
+    border: 1px solid var(--line-strong);
+    display: grid; grid-template-columns: 168px minmax(0, 1fr);
+    background: var(--panel);
+  }
+  .spine .spine-label {
+    padding: 14px 16px; border-right: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; line-height: 1.5; color: var(--teal);
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  }
+  .spine .spine-rows { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px; align-items: center; }
+  .spine .tok {
+    font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--line);
+    padding: 2px 7px; color: var(--muted); background: var(--paper);
+  }
+  .spine .tok.link { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend i { width: 9px; height: 9px; display: inline-block; }
+  .legend .l-core { background: var(--teal); }
+  .legend .l-art { background: var(--amber); }
+  .legend .l-git { background: var(--accent); }
+
+  /* ── columns & panels ─────────────────────────────────── */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .cols.tight { gap: 28px; }
+  .cols > * { min-width: 0; }
+  .stack { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+
+  .rule-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .rule-list li {
+    display: grid; grid-template-columns: 20px minmax(0,1fr); gap: 10px;
+    padding: 10px 2px; border-bottom: 1px solid var(--line);
+    font-size: 14.5px; line-height: 1.5;
+  }
+  .rule-list .mk { font-family: var(--mono); font-size: 12px; color: var(--teal); }
+  .rule-list .mk.no { color: var(--accent); }
+
+  .panel {
+    border: 1px solid var(--line-strong);
+    background: var(--panel);
+    min-width: 0;
+  }
+  .panel-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 11px 16px; border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .panel-head .tag {
+    text-transform: none; letter-spacing: 0; color: var(--faint); font-size: 10.5px;
+  }
+  .panel-body { padding: 16px; }
+  .panel-body > :first-child { margin-top: 0; }
+  .panel-body > :last-child { margin-bottom: 0; }
+
+  .core-split {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 0;
+  }
+  .core-split pre { border: 0; font-size: 11.8px; }
+  .core-split pre + pre { border-left: 1px solid var(--line); }
+
+  pre {
+    margin: 0; overflow-x: auto; background: var(--code-bg); color: var(--code-ink);
+    border: 1px solid var(--line); padding: 16px 18px;
+    font-family: var(--mono); font-size: 12.2px; line-height: 1.62;
+    tab-size: 2; max-width: 100%;
+  }
+  code { font-family: var(--mono); font-size: .92em; }
+  p code, li code, td code {
+    background: var(--code-bg); padding: 1px 5px; border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  pre code { background: none; padding: 0; border: 0; white-space: inherit; }
+  .c { color: var(--faint); }
+  .k { color: var(--teal); }
+  .s { color: var(--amber); }
+
+  table {
+    width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45;
+  }
+  th {
+    text-align: left; font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+    font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.mono, th.mono { font-family: var(--mono); font-size: 11.5px; }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 12px 16px; font-size: 14px; line-height: 1.55;
+  }
+  .callout.teal { border-left-color: var(--teal); background: var(--teal-soft); }
+  .callout.amber { border-left-color: var(--amber); background: var(--amber-soft); }
+  .callout p { margin: 0; max-width: none; }
+
+  .stage-page-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap; margin-bottom: 4px;
+  }
+  .stage-page-head h1 { margin-bottom: 10px; }
+
+  .model-line {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    font-family: var(--mono); font-size: 12px; margin: 4px 0 0;
+  }
+  .model-line .ent {
+    border: 1px solid var(--line-strong); background: var(--panel);
+    padding: 4px 10px; color: var(--ink); white-space: nowrap;
+  }
+  .model-line .ent.pk { border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); }
+  .model-line .rel { color: var(--muted); font-size: 10.5px; letter-spacing: .04em; text-align: center; line-height: 1.3; }
+  .model-line .arrow { color: var(--faint); }
+
+  .kv { display: grid; grid-template-columns: 132px minmax(0,1fr); gap: 0; font-size: 13.5px; }
+  .kv dt { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); }
+  .kv dd { margin: 0; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .kv dt:last-of-type, .kv dd:last-of-type { border-bottom: 0; }
+
+  .path-tree {
+    font-family: var(--mono); font-size: 12px; line-height: 1.7;
+    background: var(--code-bg); border: 1px solid var(--line); padding: 14px 16px;
+    overflow-x: auto; white-space: pre;
+  }
+  .path-tree .dir { color: var(--teal); }
+  .path-tree .note { color: var(--faint); }
+
+  .plan-out {
+    border: 1px solid var(--line-strong); background: var(--panel); padding: 14px 16px;
+  }
+  .plan-out .sum {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    margin-bottom: 10px; letter-spacing: .04em;
+  }
+  .plan-out .sum b { color: var(--ink); font-weight: 600; }
+
+  /* persist matrix */
+  .switch-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin: 0 0 16px; }
+  .seg {
+    display: inline-flex; border: 1px solid var(--line-strong);
+  }
+  .seg label {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    padding: 5px 12px; cursor: pointer; user-select: none;
+  }
+  .seg label + label { border-left: 1px solid var(--line-strong); }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg input:checked + span { color: var(--paper); background: var(--ink); }
+  .seg span { display: block; margin: -5px -12px; padding: 5px 12px; }
+  .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
+  tr.active-row td { background: color-mix(in srgb, var(--teal) 9%, transparent); }
+  tr.active-row td:first-child { box-shadow: inset 3px 0 0 var(--teal); }
+  th.active-col, td.active-col {
+    background: color-mix(in srgb, var(--teal) 10%, transparent);
+    box-shadow: inset 0 2px 0 var(--teal);
+  }
+
+  .footnote {
+    margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 10.5px; color: var(--faint); line-height: 1.7;
+  }
+
+  /* ── responsive ───────────────────────────────────────── */
+  @media (max-width: 980px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail {
+      position: sticky; top: 0; height: auto;
+      padding: 14px 16px 0; gap: 12px;
+      border-right: 0; border-bottom: 1px solid var(--line);
+      min-width: 0; overflow: hidden;
+    }
+    .brand { flex-direction: row; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .brand .name { font-size: 17px; }
+    .rail-note { display: none; }
+    .rail nav {
+      flex-direction: row; overflow-x: auto; gap: 0; padding-bottom: 0;
+      scrollbar-width: thin;
+    }
+    .rail nav button {
+      white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent;
+      padding: 8px 10px;
+    }
+    .rail nav button[aria-selected="true"] { border-bottom-color: var(--accent); }
+    .page { padding: 34px 20px 72px; scroll-margin-top: 132px; }
+    .cols { grid-template-columns: 1fr; gap: 28px; }
+    .core-split { grid-template-columns: 1fr; }
+    .core-split pre + pre { border-left: 0; border-top: 1px solid var(--line); }
+    .pipe { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stage { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .stage:nth-child(2n) { border-right: 0; }
+    .stage::after { display: none; }
+    .stage:nth-last-child(-n+2) { border-bottom: 0; }
+    .spine { grid-template-columns: 1fr; }
+    .spine .spine-label { border-right: 0; border-bottom: 1px solid var(--line); flex-direction: row; gap: 10px; align-items: baseline; }
+    .kv { grid-template-columns: 108px minmax(0,1fr); }
+  }
+  @media (max-width: 560px) {
+    .pipe { grid-template-columns: 1fr; }
+    .stage { border-right: 0; }
+    .stage:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .stage:last-child { border-bottom: 0; }
+  }
+
+  @media print {
+    .rail, .skip { display: none; }
+    .shell { display: block; }
+    .page { display: block !important; max-width: none; padding: 0 0 40px; break-after: page; }
+    .page:last-child { break-after: auto; }
+    a { color: inherit; }
+    pre { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<div class="shell">
+
+  <aside class="rail">
+    <div class="brand">
+      <span class="mark">Coherence / contract</span>
+      <span class="name">Вертикальный слайс</span>
+      <span class="sub">draft v0 · 2026-11-19</span>
+      <div class="lang-row" aria-label="Язык">
+        <a class="lang" href="vertical-slice.html" data-base="vertical-slice.html" hreflang="en" lang="en">EN</a>
+        <span class="lang-sep">/</span>
+        <span class="lang-current">RU</span>
+      </div>
+    </div>
+    <nav role="tablist" aria-orientation="vertical" aria-label="Разделы">
+      <button role="tab" id="tab-summary" aria-controls="summary" aria-selected="true" data-page="summary"><span class="num">00</span>Обзор</button>
+      <button role="tab" id="tab-schema" aria-controls="schema" aria-selected="false" data-page="schema"><span class="num">01</span>Схема</button>
+      <button role="tab" id="tab-author" aria-controls="author" aria-selected="false" data-page="author"><span class="num">02</span>Author</button>
+      <button role="tab" id="tab-ingest" aria-controls="ingest" aria-selected="false" data-page="ingest"><span class="num">03</span>Ingest</button>
+      <button role="tab" id="tab-link" aria-controls="link" aria-selected="false" data-page="link"><span class="num">04</span>Link</button>
+      <button role="tab" id="tab-execute" aria-controls="execute" aria-selected="false" data-page="execute"><span class="num">05</span>Execute</button>
+      <button role="tab" id="tab-report" aria-controls="report" aria-selected="false" data-page="report"><span class="num">06</span>Report</button>
+    </nav>
+    <div class="rail-note">
+      source of truth<br>
+      <span style="color:var(--teal)">contracts.jsonl</span> (git)<br>
+      artifacts<br>
+      <span style="color:var(--amber)">run/{ts}-{behavior}/</span> (ignored)
+    </div>
+  </aside>
+
+  <main id="main">
+
+    <!-- ═══ 00 SUMMARY ═══════════════════════════════════ -->
+    <section class="page active" id="summary" role="tabpanel" aria-labelledby="tab-summary">
+      <p class="eyebrow"><span class="budget">1 страница</span> сводка</p>
+      <h1>Один spec. Все AC. Код. Прогон. Отчёт.</h1>
+      <p class="lede">
+        Минимальный контракт, который покрывает вертикальный путь целиком и ничего сверх него.
+        Таблицы — это JSONL-строки в git. Protobuf описывает строку, а не ORM.
+        Всё, что не нужно этому пути, вынесено за границу слайса.
+      </p>
+
+      <div class="meta-row">
+        <span class="chip accent">kernel ⊥ core</span>
+        <span class="chip">~150 строк proto</span>
+        <span class="chip">28 → 14 messages</span>
+        <span class="chip teal">link — единственный generic join</span>
+      </div>
+
+      <div class="pipe" role="img" aria-label="Поток: Author, Ingest, Link, Select, Execute, Report">
+        <div class="stage"><span class="s-num">01</span><span class="s-name">Author</span><span class="s-what">spec + AC + owner в JSONL</span></div>
+        <div class="stage"><span class="s-num">02</span><span class="s-name">Ingest</span><span class="s-what">repo → branch → file</span></div>
+        <div class="stage"><span class="s-num">03</span><span class="s-name">Link</span><span class="s-what">AC —verified_by→ file</span></div>
+        <div class="stage"><span class="s-num">04</span><span class="s-name">Select</span><span class="s-what">links → run plan</span></div>
+        <div class="stage"><span class="s-num">05</span><span class="s-name">Execute</span><span class="s-what">behavior engine → artifacts</span></div>
+        <div class="stage"><span class="s-num">06</span><span class="s-name">Report</span><span class="s-what">evidence → сигналы → persist</span></div>
+      </div>
+
+      <div class="spine">
+        <div class="spine-label">
+          contracts.jsonl
+          <span style="color:var(--faint);font-size:10px">versioned · deterministic order</span>
+        </div>
+        <div class="spine-rows">
+          <span class="tok">spec</span>
+          <span class="tok">acceptance_criterion</span>
+          <span class="tok">owner</span>
+          <span class="tok">code_repo</span>
+          <span class="tok">repo_branch</span>
+          <span class="tok">code_file</span>
+          <span class="tok">scip_symbol</span>
+          <span class="tok">scip_link</span>
+          <span class="tok link">link</span>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><i class="l-git"></i>источник истины (git)</span>
+        <span><i class="l-art"></i>artifact bundle (gitignored, inspectable)</span>
+        <span><i class="l-core"></i>ядро контракта</span>
+      </div>
+
+      <section class="block">
+        <div class="cols">
+          <div>
+            <h2>В слайсе</h2>
+            <ul class="rule-list">
+              <li><span class="mk">+</span><span>Один spec со всеми AC и владельцем.</span></li>
+              <li><span class="mk">+</span><span>Ingest списка репозиториев и веток из конфига.</span></li>
+              <li><span class="mk">+</span><span>Ручная или агентская связка AC —<code>verified_by</code>→ code_file.</span></li>
+              <li><span class="mk">+</span><span>Детерминированный выбор: links → run plan.</span></li>
+              <li><span class="mk">+</span><span>Один behavior: <code>run_tests(files)</code>; artifacts в <code>run/</code>.</span></li>
+              <li><span class="mk">+</span><span>Отчёт по каждому RunItem; <code>--persist</code> решает, что публикуется.</span></li>
+              <li><span class="mk">+</span><span>Пример расширения: Confluence-страница через <code>persisted_to</code>.</span></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Отложено осознанно</h2>
+            <ul class="rule-list">
+              <li><span class="mk no">−</span><span><code>ObjectKindDefinition</code> и <code>Any</code>-envelope: не нужны, пока объекты третьих сторон не появляются в runtime.</span></li>
+              <li><span class="mk no">−</span><span>Протоколы валидации: в слайсе валидация — это вывод тула и exit code.</span></li>
+              <li><span class="mk no">−</span><span>Entity / Attribute / State / Transition / Invariant — вне пути.</span></li>
+              <li><span class="mk no">−</span><span>Глубокий SCIP-ingest: таблицы зарезервированы, связи — на уровне файлов.</span></li>
+              <li><span class="mk no">−</span><span>Много behavior-движков: один, но точка расширения видна.</span></li>
+              <li><span class="mk no">−</span><span>Jira/GitHub-публикаторы: паттерн доказан одним Confluence-примером.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Карта пакетов</h2>
+        <div class="panel">
+          <div class="panel-head"><span>imports</span><span class="tag">правило: kernel не импортирует core</span></div>
+          <div class="panel-body">
+<pre><code><span class="k">package</span> coherence.kernel.v1   <span class="c">// RecordMeta, Link</span>
+   <span class="c">↑</span>
+<span class="k">package</span> coherence.core.v1     <span class="c">// Spec, AcceptanceCriterion, Owner, Code*, Scip*, Run*</span>
+   <span class="c">↑</span>
+<span class="k">package</span> coherence.ext.*       <span class="c">// publisher-таблицы: confluence.v1.Page, ...</span></code></pre>
+          </div>
+        </div>
+      </section>
+
+      <p class="footnote">
+        proposal · не финальный контракт · proto-файлы пока не переписаны<br>
+        все размеры — бюджеты, а не обещания
+      </p>
+    </section>
+
+    <!-- ═══ 01 SCHEMA ════════════════════════════════════ -->
+    <section class="page" id="schema" role="tabpanel" aria-labelledby="tab-schema">
+      <p class="eyebrow"><span class="budget">≤ 1 страница</span> protobuf</p>
+      <h1>Схема</h1>
+      <p class="lede">
+        Три пакета, четырнадцать сообщений. Строка таблицы — это message с общим
+        <code>RecordMeta</code>; связь любых двух строк — один <code>Link</code>.
+      </p>
+
+      <div class="cols">
+        <div class="panel">
+          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">~30 строк</span></div>
+          <div class="panel-body" style="padding:0;border:0">
+<pre style="border:0"><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
+<span class="k">package</span> coherence.kernel.v1;
+
+<span class="c">// Общая идентичность и отображение для любой строки.</span>
+<span class="k">message</span> RecordMeta {
+  <span class="k">string</span> id    = 1;  <span class="c">// стабильный, не переиспользуется</span>
+  <span class="k">string</span> slug  = 2;  <span class="c">// человеческий handle</span>
+  <span class="k">string</span> title = 3;
+  <span class="k">string</span> description = 4;
+  <span class="k">string</span> status = 5; <span class="c">// draft | active | archived</span>
+  <span class="k">int64</span> created_at_unix_s = 10;
+  <span class="k">int64</span> updated_at_unix_s = 11;
+  <span class="k">map</span>&lt;<span class="k">string</span>, <span class="k">string</span>&gt; annotations = 20;
+}
+
+<span class="c">// Одно направленное семантическое ребро между строками.</span>
+<span class="k">message</span> Link {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> type_from = 2;  <span class="c">// "acceptance_criterion"</span>
+  <span class="k">string</span> from_id   = 3;
+  <span class="k">string</span> type_to   = 4;  <span class="c">// "code_file"</span>
+  <span class="k">string</span> to_id     = 5;
+  <span class="k">string</span> relation_kind = 6; <span class="c">// "verified_by"</span>
+  <span class="k">string</span> note = 7;
+  <span class="k">double</span> confidence = 8;    <span class="c">// 1.0 authored, &lt;1 inferred</span>
+  <span class="k">int64</span> created_at_unix_s = 10;
+  <span class="k">int64</span> updated_at_unix_s = 11;
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span>coherence/ext/confluence/v1/page.proto</span><span class="tag">~12 строк</span></div>
+          <div class="panel-body" style="padding:0;border:0">
+<pre style="border:0"><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
+<span class="k">package</span> coherence.ext.confluence.v1;
+
+<span class="k">import</span> <span class="s">"coherence/kernel/v1/kernel.proto"</span>;
+
+<span class="c">// Composition over inheritance: core не знает об этой таблице.</span>
+<span class="k">message</span> Page {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> space_key   = 2;
+  <span class="k">string</span> external_id = 3;
+  <span class="k">string</span> url         = 4;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <section class="block" style="margin-top:22px">
+        <div class="panel">
+          <div class="panel-head"><span>coherence/core/v1/core.proto</span><span class="tag">~90 строк · две колонки</span></div>
+          <div class="core-split">
+<pre><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
+<span class="k">package</span> coherence.core.v1;
+
+<span class="k">import</span> <span class="s">"coherence/kernel/v1/kernel.proto"</span>;
+
+<span class="k">message</span> Owner {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> name = 2;
+}
+
+<span class="k">message</span> Spec {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> level    = 2; <span class="c">// product | system | module | ...</span>
+  <span class="k">string</span> owner_id = 3;
+}
+
+<span class="k">message</span> AcceptanceCriterion {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> spec_id = 2;
+}
+
+<span class="k">message</span> CodeRepo {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> path = 2;
+}
+
+<span class="k">message</span> RepoBranch {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> code_repo_id = 2;
+  <span class="k">string</span> name         = 3;
+  <span class="k">string</span> head_sha     = 4;
+}
+
+<span class="k">message</span> CodeFile {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> repo_branch_id = 2;
+  <span class="k">string</span> file_path      = 3;
+  <span class="k">string</span> sha            = 4;
+}</code></pre>
+<pre><code><span class="c">// продолжение core.proto</span>
+
+<span class="c">// Зарезервировано под SCIP; в слайсе не заполняется.</span>
+<span class="k">message</span> ScipSymbol {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> code_file_id = 2;
+  <span class="k">string</span> symbol       = 3;
+  <span class="k">string</span> kind         = 4;
+  <span class="k">int32</span>  start_line   = 5;
+  <span class="k">int32</span>  end_line     = 6;
+}
+
+<span class="k">message</span> ScipLink {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> from_symbol_id = 2;
+  <span class="k">string</span> to_symbol_id   = 3;
+  <span class="k">string</span> relation_kind  = 4;
+}
+
+<span class="c">// Run — это факт исполнения, а не объект каталога.</span>
+<span class="k">message</span> Run {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> behavior = 2; <span class="c">// "run_tests"</span>
+  <span class="k">string</span> context  = 3; <span class="c">// "local" | "ci"</span>
+  <span class="k">string</span> status   = 4; <span class="c">// ok | failed | partial</span>
+  <span class="k">int64</span> started_at_unix_s  = 5;
+  <span class="k">int64</span> finished_at_unix_s = 6;
+  <span class="k">repeated</span> RunItem items = 10;
+}
+
+<span class="k">message</span> RunItem {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> link_id = 2;
+  <span class="k">string</span> acceptance_criterion_id = 3;
+  <span class="k">string</span> code_file_id = 4;
+  <span class="k">string</span> expected = 5;
+  <span class="k">string</span> actual   = 6;
+  <span class="k">string</span> reason   = 7;
+  <span class="k">string</span> status   = 8; <span class="c">// ok | failed | skipped</span>
+  <span class="k">repeated</span> Artifact artifacts = 10;
+}
+
+<span class="k">message</span> Artifact {
+  <span class="k">string</span> id   = 1;
+  <span class="k">string</span> kind = 2; <span class="c">// log | screenshot | recording | trace</span>
+  <span class="k">string</span> uri  = 3; <span class="c">// run/{ts}-{behavior}/...</span>
+  <span class="k">int64</span>  size_bytes = 4;
+  <span class="k">map</span>&lt;<span class="k">string</span>, <span class="k">string</span>&gt; annotations = 5;
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Решения, которые делают схему маленькой</h2>
+        <div class="panel">
+          <div class="panel-body">
+            <table>
+              <thead><tr><th>Решение</th><th>Почему</th></tr></thead>
+              <tbody>
+                <tr><td>Один <code>RecordMeta</code> на все таблицы</td><td>id / slug / title / description / status / время описываются один раз, а не в каждом message.</td></tr>
+                <tr><td>Один <code>Link</code> вместо edge-таблиц</td><td><code>verified_by</code>, <code>depends_on</code>, <code>persisted_to</code> — строки одного вида, без отдельных message на каждую связь.</td></tr>
+                <tr><td>Канонические имена — singular</td><td><code>type_from</code> / <code>type_to</code> совпадают с именами таблиц и message: <code>spec</code>, <code>acceptance_criterion</code>, <code>code_file</code>. Один словарь вместо двух.</td></tr>
+                <tr><td>Никакого <code>Any</code> и реестров</td><td>JSONL уже типизирован именем таблицы. Реестр kinds вернётся, когда появятся runtime-объекты третьих сторон.</td></tr>
+                <tr><td>Расширения — отдельные пакеты</td><td>Confluence/Jira добавляют таблицы и линкуются к core через <code>Link</code>. Core не меняется.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="callout teal">
+          <p>Граница пакетов проверяема: <code>coherence.kernel.v1</code> не импортирует <code>coherence.core.v1</code>. Это правило уже зафиксировано в AGENTS.md и покрывается buf-плагином.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 02 AUTHOR ════════════════════════════════════ -->
+    <section class="page" id="author" role="tabpanel" aria-labelledby="tab-author">
+      <div class="stage-page-head">
+        <div>
+          <p class="eyebrow"><span class="budget">≤ 1 страница</span> authoring</p>
+          <h1>Author</h1>
+        </div>
+        <span class="chip teal">source of truth</span>
+      </div>
+      <p class="lede">Спека и её критерии живут в версионированном JSONL. Это не база и не API — это diff-friendly файл в git.</p>
+
+      <section class="block">
+        <h2>Модель</h2>
+        <div class="model-line" aria-label="owner 1 к N spec 1 к N acceptance criterion">
+          <span class="ent pk">owner</span>
+          <span class="rel">1<br>──<br>N</span>
+          <span class="ent pk">spec</span>
+          <span class="rel">1<br>──<br>N</span>
+          <span class="ent pk">acceptance_criterion</span>
+        </div>
+        <div class="cols tight" style="margin-top:20px">
+          <div class="panel">
+            <div class="panel-head"><span>таблицы</span><span class="tag">columns</span></div>
+            <div class="panel-body">
+              <table>
+                <thead><tr><th>table</th><th>columns</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono">owner</td><td class="mono">id · name</td></tr>
+                  <tr><td class="mono">spec</td><td class="mono">id · slug · level · status · title · description · owner_id</td></tr>
+                  <tr><td class="mono">acceptance_criterion</td><td class="mono">id · spec_id · slug · status · title · description</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span>messages</span><span class="tag">core.proto</span></div>
+            <div class="panel-body" style="padding:0">
+<pre style="border:0"><code><span class="k">message</span> Spec {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> level    = 2;
+  <span class="k">string</span> owner_id = 3;
+}
+
+<span class="k">message</span> AcceptanceCriterion {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> spec_id = 2;
+}
+
+<span class="k">message</span> Owner {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> name = 2;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Результат</h2>
+        <div class="cols tight">
+          <div>
+            <div class="panel">
+              <div class="panel-head"><span>contracts.jsonl</span><span class="tag">одна строка = одна запись</span></div>
+              <div class="panel-body" style="padding:0">
+<pre style="border:0"><code>{"table":"spec","id":"spec-001","slug":"specs-as-code","level":"module","status":"active","title":"Specs as code","description":"...","owner_id":"owner-001"}
+{"table":"acceptance_criterion","id":"ac-001","spec_id":"spec-001","slug":"ac-jsonl-roundtrip","status":"active","title":"JSONL roundtrip"}
+{"table":"owner","id":"owner-001","name":"core"}</code></pre>
+              </div>
+            </div>
+          </div>
+          <div>
+            <ul class="rule-list">
+              <li><span class="mk">1</span><span>Детерминированный порядок: <code>(table, id)</code>. Diff читается, merge предсказуем.</span></li>
+              <li><span class="mk">2</span><span>Уникальность: <code>id</code> глобально, <code>slug</code> — в пределах таблицы.</span></li>
+              <li><span class="mk">3</span><span>Ссылки проверяются при чтении: <code>owner_id</code> и <code>spec_id</code> должны существовать.</span></li>
+              <li><span class="mk">4</span><span>Ошибки — список <code>{line, table, id, problem}</code> и exit code 1.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="callout">
+          <p>Один файл — осознанный старт. Когда объём вырастет, разбиение на <code>contracts/spec.jsonl</code> и т.д. — механическая операция, схема не меняется.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 03 INGEST ════════════════════════════════════ -->
+    <section class="page" id="ingest" role="tabpanel" aria-labelledby="tab-ingest">
+      <div class="stage-page-head">
+        <div>
+          <p class="eyebrow"><span class="budget">≤ 1 страница</span> ingestion</p>
+          <h1>Ingest</h1>
+        </div>
+        <span class="chip">idempotent</span>
+      </div>
+      <p class="lede">Структура кода — это данные. Конфиг говорит, что читать; результат — строки code_* в том же JSONL.</p>
+
+      <section class="block">
+        <h2>Модель</h2>
+        <div class="model-line" aria-label="code_repo to repo_branch to code_file, optionally to scip_symbol and scip_link">
+          <span class="ent">code_repo</span>
+          <span class="arrow">→</span>
+          <span class="ent">repo_branch</span>
+          <span class="arrow">→</span>
+          <span class="ent pk">code_file</span>
+          <span class="arrow">⇢</span>
+          <span class="ent">scip_symbol</span>
+          <span class="arrow">⇢</span>
+          <span class="ent">scip_link</span>
+        </div>
+        <p class="small" style="margin-top:10px">Пунктир — зарезервированная часть, не блокирует слайс. Связи AC↔код в нём работают на уровне файлов.</p>
+      </section>
+
+      <section class="block">
+        <div class="cols tight">
+          <div>
+            <h2>Конфиг</h2>
+            <div class="panel">
+              <div class="panel-head"><span>coherence.ingest.yaml</span><span class="tag">tool config, не proto</span></div>
+              <div class="panel-body" style="padding:0">
+<pre style="border:0"><code>repos:
+  - path: .
+    branches: [main]
+    include:
+      - "src/**"
+      - "tests/**"
+      - "e2e/**"</code></pre>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2>Messages</h2>
+            <div class="panel">
+              <div class="panel-head"><span>core.proto</span><span class="tag">code ingestion</span></div>
+              <div class="panel-body" style="padding:0">
+<pre style="border:0"><code><span class="k">message</span> CodeRepo {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> path = 2;
+}
+<span class="k">message</span> RepoBranch {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> code_repo_id = 2;
+  <span class="k">string</span> name     = 3;
+  <span class="k">string</span> head_sha = 4;
+}
+<span class="k">message</span> CodeFile {
+  coherence.kernel.v1.RecordMeta meta = 1;
+  <span class="k">string</span> repo_branch_id = 2;
+  <span class="k">string</span> file_path = 3;
+  <span class="k">string</span> sha       = 4;
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Результат</h2>
+        <div class="cols tight">
+          <div class="panel">
+            <div class="panel-head"><span>upsert semantics</span><span class="tag">deterministic</span></div>
+            <div class="panel-body">
+              <table>
+                <thead><tr><th>Событие</th><th>Действие</th></tr></thead>
+                <tbody>
+                  <tr><td>Файл появился</td><td>insert <code>code_file</code> со статусом <code>active</code></td></tr>
+                  <tr><td>sha изменился</td><td>update <code>sha</code>, <code>updated_at_unix_s</code></td></tr>
+                  <tr><td>Файл исчез</td><td><code>status=archived</code>, строку не удаляем</td></tr>
+                  <tr><td>Повторный ingest</td><td>ноль новых строк, если ничего не менялось</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="plan-out">
+              <div class="sum">ingest report · <b>main @ 4f2a1c</b></div>
+<pre style="border:0;background:transparent;padding:0"><code>code_file  +128  ~3  -2 (archived)
+elapsed    0.41s
+exit       0</code></pre>
+            </div>
+            <p class="small" style="margin-top:14px">Ключ идентичности файла: <code>(repo.path, branch.name, file_path)</code>. Id — производный, поэтому повторный ingest не создаёт дублей.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 04 LINK ══════════════════════════════════════ -->
+    <section class="page" id="link" role="tabpanel" aria-labelledby="tab-link">
+      <div class="stage-page-head">
+        <div>
+          <p class="eyebrow"><span class="budget">≤ 1 страница</span> linking</p>
+          <h1>Link</h1>
+        </div>
+        <span class="chip accent">generic join</span>
+      </div>
+      <p class="lede">AC становится проверяемым критерием, когда указывает на код. Это ребро — строка таблицы <code>link</code>.</p>
+
+      <section class="block">
+        <h2>Модель</h2>
+        <div class="model-line">
+          <span class="ent pk">acceptance_criterion</span>
+          <span class="rel">verified_by →</span>
+          <span class="ent pk">code_file</span>
+        </div>
+        <div class="cols tight" style="margin-top:20px">
+          <div class="panel">
+            <div class="panel-head"><span>link columns</span><span class="tag">один shape на все связи</span></div>
+            <div class="panel-body">
+              <table>
+                <thead><tr><th>field</th><th>example</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono">id</td><td class="mono">link-001</td></tr>
+                  <tr><td class="mono">type_from / from_id</td><td class="mono">acceptance_criterion / ac-001</td></tr>
+                  <tr><td class="mono">type_to / to_id</td><td class="mono">code_file / file-017</td></tr>
+                  <tr><td class="mono">relation_kind</td><td class="mono">verified_by</td></tr>
+                  <tr><td class="mono">note</td><td class="mono">"e2e: jsonl roundtrip"</td></tr>
+                  <tr><td class="mono">confidence</td><td class="mono">1.0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span>relation vocabulary</span><span class="tag">extensible by data</span></div>
+            <div class="panel-body">
+              <table>
+                <thead><tr><th>relation</th><th>from → to</th><th>behavior</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono">verified_by</td><td class="mono">ac → code_file</td><td><code>run_tests(files)</code></td></tr>
+                  <tr><td class="mono">depends_on</td><td class="mono">spec → spec</td><td>impact / ordering, не исполняется</td></tr>
+                  <tr><td class="mono">persisted_to</td><td class="mono">spec → confluence_page</td><td><code>upsert_page</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Messages</h2>
+        <div class="panel">
+          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">одна форма для всех рёбер</span></div>
+          <div class="panel-body" style="padding:0">
+<pre style="border:0"><code><span class="k">message</span> Link {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> type_from = 2;  <span class="c">// "acceptance_criterion"</span>
+  <span class="k">string</span> from_id   = 3;
+  <span class="k">string</span> type_to   = 4;  <span class="c">// "code_file"</span>
+  <span class="k">string</span> to_id     = 5;
+  <span class="k">string</span> relation_kind = 6; <span class="c">// "verified_by"</span>
+  <span class="k">string</span> note = 7;
+  <span class="k">double</span> confidence = 8; <span class="c">// 1.0 authored, &lt;1 inferred</span>
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Selection → run plan</h2>
+        <p>Выбор полностью детерминирован: никакого LLM в момент прогона. Агент может предлагать links, но выполняются только записанные рёбра.</p>
+        <div class="cols tight">
+          <div class="panel">
+            <div class="panel-head"><span>правило</span><span class="tag">verified_by</span></div>
+            <div class="panel-body" style="padding:0">
+<pre style="border:0"><code>links
+  .where(relation_kind == <span class="s">"verified_by"</span>)
+  .where(source.status == <span class="s">"active"</span>)
+  .join(acceptance_criterion on from_id)
+  .join(code_file on to_id)
+  .group_by(ac.id)</code></pre>
+            </div>
+          </div>
+          <div class="plan-out">
+            <div class="sum">plan · <b>1 spec · 3 AC · 4 files</b></div>
+            <table>
+              <thead><tr><th>AC</th><th>files</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">ac-001</td><td class="mono">e2e/spec.spec.ts · e2e/api.spec.ts</td></tr>
+                <tr><td class="mono">ac-002</td><td class="mono">tests/jsonl_test.go</td></tr>
+                <tr><td class="mono">ac-003</td><td class="mono">tests/report_test.go</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="callout">
+          <p>AC с <code>status=archived</code> или link с <code>confidence&lt;1</code> не попадают в план автоматически. Их можно включить явным scope-фильтром.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 05 EXECUTE ═══════════════════════════════════ -->
+    <section class="page" id="execute" role="tabpanel" aria-labelledby="tab-execute">
+      <div class="stage-page-head">
+        <div>
+          <p class="eyebrow"><span class="budget">≤ 1 страница</span> execution</p>
+          <h1>Execute</h1>
+        </div>
+        <span class="chip teal">behavior engine</span>
+      </div>
+      <p class="lede">План превращается в артефакты. Behavior — это чистая функция от пары (link kind, target kind) и контекста окружения.</p>
+
+      <section class="block">
+        <h2>Модель</h2>
+        <div class="panel">
+          <div class="panel-body">
+            <table>
+              <thead><tr><th>link kind</th><th>target</th><th>context</th><th>behavior</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">verified_by</td><td class="mono">code_file</td><td class="mono">local / ci</td><td><code>run_tests(files)</code></td></tr>
+              </tbody>
+            </table>
+            <p class="small" style="margin:12px 0 0">Один behavior в слайсе. Реестр поведений — точка расширения, а не часть контракта.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Messages</h2>
+        <div class="panel">
+          <div class="panel-head"><span>core.proto</span><span class="tag">run / item / artifact</span></div>
+          <div class="panel-body" style="padding:0">
+<pre style="border:0"><code><span class="k">message</span> Run {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> behavior = 2;  <span class="c">// run_tests</span>
+  <span class="k">string</span> context  = 3;  <span class="c">// local | ci</span>
+  <span class="k">string</span> status   = 4;  <span class="c">// ok | failed | partial</span>
+  <span class="k">int64</span> started_at_unix_s  = 5;
+  <span class="k">int64</span> finished_at_unix_s = 6;
+  <span class="k">repeated</span> RunItem items = 10;
+}
+
+<span class="k">message</span> RunItem {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> link_id = 2;
+  <span class="k">string</span> acceptance_criterion_id = 3;
+  <span class="k">string</span> code_file_id = 4;
+  <span class="k">string</span> expected = 5;
+  <span class="k">string</span> actual   = 6;
+  <span class="k">string</span> reason   = 7;
+  <span class="k">string</span> status   = 8;  <span class="c">// ok | failed | skipped</span>
+  <span class="k">repeated</span> Artifact artifacts = 10;
+}
+
+<span class="k">message</span> Artifact {
+  <span class="k">string</span> id = 1;
+  <span class="k">string</span> kind = 2;  <span class="c">// log | screenshot | recording | trace</span>
+  <span class="k">string</span> uri  = 3;  <span class="c">// run/{ts}-{behavior}/...</span>
+  <span class="k">int64</span>  size_bytes = 4;
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Результат</h2>
+        <div class="cols tight">
+          <div>
+            <div class="panel-head" style="border:1px solid var(--line-strong);border-bottom:0;background:var(--panel)"><span>artifact bundle</span><span class="tag">gitignored, inspectable</span></div>
+            <div class="path-tree"><span class="dir">run/</span>1763550000-run_tests/
+  plan.json
+  <span class="dir">link-001/</span>
+    stdout.log
+    stderr.log
+    junit.xml
+    screenshot.png      <span class="note"># playwright</span>
+    trace.zip           <span class="note"># step-by-step repro</span>
+  <span class="dir">link-002/</span>
+    stdout.log
+  report.json</div>
+          </div>
+          <div>
+            <ul class="rule-list">
+              <li><span class="mk">→</span><span>Артефакты пишутся всегда, пока идёт прогон: их можно открыть руками.</span></li>
+              <li><span class="mk">→</span><span><code>--persist</code> управляет только публикацией: report-строки и внешние копии evidence.</span></li>
+              <li><span class="mk">→</span><span>Exit code: <code>0</code> — все ok/skipped, <code>1</code> — есть failed.</span></li>
+              <li><span class="mk">→</span><span>Каждый RunItem ссылается на исходный <code>link_id</code> — провенанс не теряется.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 06 REPORT ════════════════════════════════════ -->
+    <section class="page" id="report" role="tabpanel" aria-labelledby="tab-report">
+      <div class="stage-page-head">
+        <div>
+          <p class="eyebrow"><span class="budget">≤ 1 страница</span> reporting</p>
+          <h1>Report</h1>
+        </div>
+        <span class="chip accent">human + agent signal</span>
+      </div>
+      <p class="lede">Отчёт — это не дамп логов, а минимальный набор сигналов: какой AC сломан, где код, что ожидалось, как повторить.</p>
+
+      <section class="block">
+        <h2>Модель</h2>
+        <div class="panel">
+          <div class="panel-head"><span>run_tests_report</span><span class="tag">строка на RunItem</span></div>
+          <div class="panel-body" style="padding:0">
+            <table>
+              <thead><tr><th>field</th><th>meaning</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">run_id</td><td>какой прогон</td></tr>
+                <tr><td class="mono">link_id</td><td>какое ребро проверялось</td></tr>
+                <tr><td class="mono">acceptance_criterion_id</td><td>какой AC</td></tr>
+                <tr><td class="mono">code_file_id</td><td>какой файл исполнялся</td></tr>
+                <tr><td class="mono">expected / actual</td><td>ожидание и факт</td></tr>
+                <tr><td class="mono">reason</td><td>почему failed/skipped</td></tr>
+                <tr><td class="mono">status</td><td><code>ok</code> · <code>failed</code> · <code>skipped</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Результат</h2>
+        <div class="panel">
+          <div class="panel-head"><span>report.json</span><span class="tag">строка на RunItem</span></div>
+          <div class="panel-body" style="padding:0">
+<pre style="border:0"><code>{
+  "run_id": "run-1763550000",
+  "link_id": "link-001",
+  "acceptance_criterion_id": "ac-001",
+  "code_file_id": "file-017",
+  "expected": "JSONL roundtrip preserves all ACs",
+  "actual": "1 AC lost its spec_id after re-import",
+  "reason": "assertion failed at e2e/spec.spec.ts:42",
+  "status": "failed"
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Progressive disclosure</h2>
+        <div class="cols tight">
+          <ol class="rule-list" style="counter-reset:none">
+            <li><span class="mk">1</span><span>Сломанный AC: текст и id. Самое важное — первым.</span></li>
+            <li><span class="mk">2</span><span>Файл и диапазон строк; сниппет под спойлером.</span></li>
+            <li><span class="mk">3</span><span>Контекст: соседние символы, другие файлы, соседние AC — свёрнуто.</span></li>
+            <li><span class="mk">4</span><span>Воспроизведение: screenshot / recording / trace + команда re-run.</span></li>
+          </ol>
+          <div class="callout amber">
+            <p><b>Принцип:</b> отчёт должен читаться за 30 секунд, а раскрываться до полного debug-контекста только по запросу. Evidence пре-процессится под эти четыре уровня.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Persist policy</h2>
+        <p>Один и тот же прогон ведёт себя по-разному в зависимости от контекста и флага. Переключи:</p>
+        <div class="switch-row">
+          <div class="seg" role="radiogroup" aria-label="Контекст">
+            <label><input type="radio" name="ctx" value="local" checked><span>local</span></label>
+            <label><input type="radio" name="ctx" value="ci"><span>ci</span></label>
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Persist">
+            <label><input type="checkbox" id="persist"><span>--persist</span></label>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0">
+            <table id="persist-matrix">
+              <thead><tr><th>Что</th><th>local</th><th>ci</th><th>+ --persist</th></tr></thead>
+              <tbody>
+                <tr><td>artifact bundle в <code>run/</code></td><td data-col="local">да</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
+                <tr><td>report-строки в contracts.jsonl</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
+                <tr><td>внешние копии evidence</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
+                <tr><td>PR comment / статус</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="small" style="margin-top:12px" id="persist-hint">local по умолчанию: артефакты лежат рядом, но ничего не публикуется.</p>
+      </section>
+
+      <section class="block">
+        <h2>Publish — composition</h2>
+        <div class="model-line">
+          <span class="ent">spec</span>
+          <span class="rel">persisted_to →</span>
+          <span class="ent">confluence_page</span>
+          <span class="arrow">⇒</span>
+          <span class="mono" style="color:var(--muted)">upsert_page(spec)</span>
+        </div>
+        <p class="small" style="margin-top:12px">Публикация не добавляет полей в <code>Spec</code>. Она добавляет таблицу расширения и ребро. Тот же паттерн — Jira, GitHub, HTML-сайт.</p>
+      </section>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  (() => {
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    const pages = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+    function show(id, pushHash = true) {
+      const target = pages.find(p => p.id === id);
+      if (!target) return;
+      pages.forEach(p => p.classList.toggle('active', p === target));
+      tabs.forEach(t => {
+        const selected = t.dataset.page === id;
+        t.setAttribute('aria-selected', String(selected));
+        t.tabIndex = selected ? 0 : -1;
+      });
+      if (pushHash && location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+      const langLink = document.querySelector('a.lang[data-base]');
+      if (langLink) langLink.href = langLink.dataset.base + '#' + id;
+      window.scrollTo(0, 0);
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => show(tab.dataset.page));
+      tab.addEventListener('keydown', (e) => {
+        let next = null;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next !== null) {
+          e.preventDefault();
+          tabs[next].focus();
+          show(tabs[next].dataset.page);
+        }
+      });
+    });
+
+    const initial = location.hash.replace('#', '') || 'summary';
+    show(initial, false);
+    window.addEventListener('hashchange', () => show(location.hash.replace('#', ''), false));
+
+    // persist matrix
+    const ctxRadios = document.querySelectorAll('input[name="ctx"]');
+    const persist = document.getElementById('persist');
+    const hint = document.getElementById('persist-hint');
+
+    function render() {
+      const ctx = document.querySelector('input[name="ctx"]:checked').value;
+      const force = persist.checked;
+      const activeCol = force ? 'force' : ctx;
+
+      document.querySelectorAll('#persist-matrix [data-col]').forEach(cell => {
+        cell.classList.toggle('active-col', cell.dataset.col === activeCol);
+      });
+
+      if (force) {
+        hint.innerHTML = '<code>--persist</code> включён: report-строки и внешние копии evidence публикуются в любом контексте.';
+      } else if (ctx === 'ci') {
+        hint.innerHTML = 'ci по умолчанию: отчёт и evidence публикуются, PR получает статус.';
+      } else {
+        hint.innerHTML = 'local по умолчанию: артефакты лежат рядом, но ничего не публикуется.';
+      }
+    }
+    ctxRadios.forEach(r => r.addEventListener('change', render));
+    persist.addEventListener('change', render);
+    render();
+  })();
+</script>
+</body>
+</html>

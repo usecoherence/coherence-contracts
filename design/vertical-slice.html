@@ -1,9 +1,11 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Coherence — вертикальный слайс контракта</title>
+<link rel="alternate" hreflang="en" href="vertical-slice.html">
+<link rel="alternate" hreflang="ru" href="vertical-slice.ru.html">
+<title>Coherence — vertical slice contract</title>
 <style>
   :root {
     --paper: #f6f3ea;
@@ -100,6 +102,21 @@
   }
   .brand .name { font-family: var(--serif); font-size: 21px; line-height: 1.15; }
   .brand .sub { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .lang-row {
+    display: flex; align-items: center; gap: 5px; margin-top: 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+  }
+  .lang-current {
+    color: var(--ink); border: 1px solid var(--line-strong);
+    background: var(--panel); padding: 1px 7px;
+  }
+  .lang {
+    color: var(--accent); text-decoration: none; padding: 1px 7px;
+    border: 1px solid transparent;
+  }
+  .lang:hover { border-color: var(--line-strong); background: var(--panel); }
+  .lang-sep { color: var(--faint); }
 
   .rail nav { display: flex; flex-direction: column; gap: 2px; }
   .rail nav button {
@@ -429,18 +446,23 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#main">К содержанию</a>
+<a class="skip" href="#main">Skip to content</a>
 <div class="shell">
 
   <aside class="rail">
     <div class="brand">
       <span class="mark">Coherence / contract</span>
-      <span class="name">Вертикальный слайс</span>
+      <span class="name">Vertical slice</span>
       <span class="sub">draft v0 · 2026-11-19</span>
+      <div class="lang-row" aria-label="Language">
+        <span class="lang-current">EN</span>
+        <span class="lang-sep">/</span>
+        <a class="lang" href="vertical-slice.ru.html" data-base="vertical-slice.ru.html" hreflang="ru" lang="ru">RU</a>
+      </div>
     </div>
-    <nav role="tablist" aria-orientation="vertical" aria-label="Разделы">
-      <button role="tab" id="tab-summary" aria-controls="summary" aria-selected="true" data-page="summary"><span class="num">00</span>Обзор</button>
-      <button role="tab" id="tab-schema" aria-controls="schema" aria-selected="false" data-page="schema"><span class="num">01</span>Схема</button>
+    <nav role="tablist" aria-orientation="vertical" aria-label="Sections">
+      <button role="tab" id="tab-summary" aria-controls="summary" aria-selected="true" data-page="summary"><span class="num">00</span>Overview</button>
+      <button role="tab" id="tab-schema" aria-controls="schema" aria-selected="false" data-page="schema"><span class="num">01</span>Schema</button>
       <button role="tab" id="tab-author" aria-controls="author" aria-selected="false" data-page="author"><span class="num">02</span>Author</button>
       <button role="tab" id="tab-ingest" aria-controls="ingest" aria-selected="false" data-page="ingest"><span class="num">03</span>Ingest</button>
       <button role="tab" id="tab-link" aria-controls="link" aria-selected="false" data-page="link"><span class="num">04</span>Link</button>
@@ -459,28 +481,28 @@
 
     <!-- ═══ 00 SUMMARY ═══════════════════════════════════ -->
     <section class="page active" id="summary" role="tabpanel" aria-labelledby="tab-summary">
-      <p class="eyebrow"><span class="budget">1 страница</span> summary</p>
-      <h1>Один spec. Все AC. Код. Прогон. Отчёт.</h1>
+      <p class="eyebrow"><span class="budget">1 page</span> summary</p>
+      <h1>One spec. All ACs. Code. Run. Report.</h1>
       <p class="lede">
-        Минимальный контракт, который покрывает вертикальный путь целиком и ничего сверх него.
-        Таблицы — это JSONL-строки в git. Protobuf описывает строку, а не ORM.
-        Всё, что не нужно этому пути, вынесено за границу слайса.
+        The minimal contract that covers the vertical path end to end and nothing beyond it.
+        Tables are JSONL rows in git. Protobuf describes a row, not an ORM.
+        Everything this path does not need stays outside the slice boundary.
       </p>
 
       <div class="meta-row">
         <span class="chip accent">kernel ⊥ core</span>
-        <span class="chip">~150 строк proto</span>
+        <span class="chip">~150 lines of proto</span>
         <span class="chip">28 → 14 messages</span>
-        <span class="chip teal">link — единственный generic join</span>
+        <span class="chip teal">link — the only generic join</span>
       </div>
 
-      <div class="pipe" role="img" aria-label="Поток: Author, Ingest, Link, Select, Execute, Report">
-        <div class="stage"><span class="s-num">01</span><span class="s-name">Author</span><span class="s-what">spec + AC + owner в JSONL</span></div>
+      <div class="pipe" role="img" aria-label="Flow: Author, Ingest, Link, Select, Execute, Report">
+        <div class="stage"><span class="s-num">01</span><span class="s-name">Author</span><span class="s-what">spec + AC + owner in JSONL</span></div>
         <div class="stage"><span class="s-num">02</span><span class="s-name">Ingest</span><span class="s-what">repo → branch → file</span></div>
         <div class="stage"><span class="s-num">03</span><span class="s-name">Link</span><span class="s-what">AC —verified_by→ file</span></div>
         <div class="stage"><span class="s-num">04</span><span class="s-name">Select</span><span class="s-what">links → run plan</span></div>
         <div class="stage"><span class="s-num">05</span><span class="s-name">Execute</span><span class="s-what">behavior engine → artifacts</span></div>
-        <div class="stage"><span class="s-num">06</span><span class="s-name">Report</span><span class="s-what">evidence → сигналы → persist</span></div>
+        <div class="stage"><span class="s-num">06</span><span class="s-name">Report</span><span class="s-what">evidence → signals → persist</span></div>
       </div>
 
       <div class="spine">
@@ -502,79 +524,79 @@
       </div>
 
       <div class="legend">
-        <span><i class="l-git"></i>источник истины (git)</span>
+        <span><i class="l-git"></i>source of truth (git)</span>
         <span><i class="l-art"></i>artifact bundle (gitignored, inspectable)</span>
-        <span><i class="l-core"></i>ядро контракта</span>
+        <span><i class="l-core"></i>contract core</span>
       </div>
 
       <section class="block">
         <div class="cols">
           <div>
-            <h2>В слайсе</h2>
+            <h2>In the slice</h2>
             <ul class="rule-list">
-              <li><span class="mk">+</span><span>Один spec со всеми AC и владельцем.</span></li>
-              <li><span class="mk">+</span><span>Ingest списка репозиториев и веток из конфига.</span></li>
-              <li><span class="mk">+</span><span>Ручная или агентская связка AC —<code>verified_by</code>→ code_file.</span></li>
-              <li><span class="mk">+</span><span>Детерминированный выбор: links → run plan.</span></li>
-              <li><span class="mk">+</span><span>Один behavior: <code>run_tests(files)</code>; artifacts в <code>run/</code>.</span></li>
-              <li><span class="mk">+</span><span>Отчёт по каждому RunItem; <code>--persist</code> решает, что публикуется.</span></li>
-              <li><span class="mk">+</span><span>Пример расширения: Confluence-страница через <code>persisted_to</code>.</span></li>
+              <li><span class="mk">+</span><span>One spec with all its ACs and an owner.</span></li>
+              <li><span class="mk">+</span><span>Ingest a list of repositories and branches from config.</span></li>
+              <li><span class="mk">+</span><span>Manual or agent link: AC —<code>verified_by</code>→ code_file.</span></li>
+              <li><span class="mk">+</span><span>Deterministic selection: links → run plan.</span></li>
+              <li><span class="mk">+</span><span>One behavior: <code>run_tests(files)</code>; artifacts in <code>run/</code>.</span></li>
+              <li><span class="mk">+</span><span>Report per RunItem; <code>--persist</code> decides what gets published.</span></li>
+              <li><span class="mk">+</span><span>Extension example: a Confluence page via <code>persisted_to</code>.</span></li>
             </ul>
           </div>
           <div>
-            <h2>Отложено осознанно</h2>
+            <h2>Deliberately deferred</h2>
             <ul class="rule-list">
-              <li><span class="mk no">−</span><span><code>ObjectKindDefinition</code> и <code>Any</code>-envelope: не нужны, пока объекты третьих сторон не появляются в runtime.</span></li>
-              <li><span class="mk no">−</span><span>Протоколы валидации: в слайсе валидация — это вывод тула и exit code.</span></li>
-              <li><span class="mk no">−</span><span>Entity / Attribute / State / Transition / Invariant — вне пути.</span></li>
-              <li><span class="mk no">−</span><span>Глубокий SCIP-ingest: таблицы зарезервированы, связи — на уровне файлов.</span></li>
-              <li><span class="mk no">−</span><span>Много behavior-движков: один, но точка расширения видна.</span></li>
-              <li><span class="mk no">−</span><span>Jira/GitHub-публикаторы: паттерн доказан одним Confluence-примером.</span></li>
+              <li><span class="mk no">−</span><span><code>ObjectKindDefinition</code> and <code>Any</code>-envelope: not needed until third-party objects appear at runtime.</span></li>
+              <li><span class="mk no">−</span><span>Validation protocols: in the slice, validation is tool output plus an exit code.</span></li>
+              <li><span class="mk no">−</span><span>Entity / Attribute / State / Transition / Invariant — outside the path.</span></li>
+              <li><span class="mk no">−</span><span>Deep SCIP ingest: tables reserved, links stay at file level.</span></li>
+              <li><span class="mk no">−</span><span>Multiple behavior engines: one, with a visible extension point.</span></li>
+              <li><span class="mk no">−</span><span>Jira/GitHub publishers: pattern proven by one Confluence example.</span></li>
             </ul>
           </div>
         </div>
       </section>
 
       <section class="block">
-        <h2>Карта пакетов</h2>
+        <h2>Package map</h2>
         <div class="panel">
-          <div class="panel-head"><span>imports</span><span class="tag">правило: kernel не импортирует core</span></div>
+          <div class="panel-head"><span>imports</span><span class="tag">rule: kernel does not import core</span></div>
           <div class="panel-body">
 <pre><code><span class="k">package</span> coherence.kernel.v1   <span class="c">// RecordMeta, Link</span>
    <span class="c">↑</span>
 <span class="k">package</span> coherence.core.v1     <span class="c">// Spec, AcceptanceCriterion, Owner, Code*, Scip*, Run*</span>
    <span class="c">↑</span>
-<span class="k">package</span> coherence.ext.*       <span class="c">// publisher-таблицы: confluence.v1.Page, ...</span></code></pre>
+<span class="k">package</span> coherence.ext.*       <span class="c">// publisher tables: confluence.v1.Page, ...</span></code></pre>
           </div>
         </div>
       </section>
 
       <p class="footnote">
-        proposal · не финальный контракт · proto-файлы пока не переписаны<br>
-        все размеры — бюджеты, а не обещания
+        proposal · not the final contract · proto files not rewritten yet<br>
+        all sizes are budgets, not promises
       </p>
     </section>
 
     <!-- ═══ 01 SCHEMA ════════════════════════════════════ -->
     <section class="page" id="schema" role="tabpanel" aria-labelledby="tab-schema">
-      <p class="eyebrow"><span class="budget">≤ 1 страница</span> protobuf</p>
-      <h1>Схема</h1>
+      <p class="eyebrow"><span class="budget">≤ 1 page</span> protobuf</p>
+      <h1>Schema</h1>
       <p class="lede">
-        Три пакета, четырнадцать сообщений. Строка таблицы — это message с общим
-        <code>RecordMeta</code>; связь любых двух строк — один <code>Link</code>.
+        Three packages, fourteen messages. A table row is a message with a shared
+        <code>RecordMeta</code>; a link between any two rows is one <code>Link</code>.
       </p>
 
       <div class="cols">
         <div class="panel">
-          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">~30 строк</span></div>
+          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">~30 lines</span></div>
           <div class="panel-body" style="padding:0;border:0">
 <pre style="border:0"><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
 <span class="k">package</span> coherence.kernel.v1;
 
-<span class="c">// Общая идентичность и отображение для любой строки.</span>
+<span class="c">// Shared identity and display for any row.</span>
 <span class="k">message</span> RecordMeta {
-  <span class="k">string</span> id    = 1;  <span class="c">// стабильный, не переиспользуется</span>
-  <span class="k">string</span> slug  = 2;  <span class="c">// человеческий handle</span>
+  <span class="k">string</span> id    = 1;  <span class="c">// stable, never reused</span>
+  <span class="k">string</span> slug  = 2;  <span class="c">// human handle</span>
   <span class="k">string</span> title = 3;
   <span class="k">string</span> description = 4;
   <span class="k">string</span> status = 5; <span class="c">// draft | active | archived</span>
@@ -583,7 +605,7 @@
   <span class="k">map</span>&lt;<span class="k">string</span>, <span class="k">string</span>&gt; annotations = 20;
 }
 
-<span class="c">// Одно направленное семантическое ребро между строками.</span>
+<span class="c">// One directed semantic edge between rows.</span>
 <span class="k">message</span> Link {
   <span class="k">string</span> id = 1;
   <span class="k">string</span> type_from = 2;  <span class="c">// "acceptance_criterion"</span>
@@ -600,14 +622,14 @@
         </div>
 
         <div class="panel">
-          <div class="panel-head"><span>coherence/ext/confluence/v1/page.proto</span><span class="tag">~12 строк</span></div>
+          <div class="panel-head"><span>coherence/ext/confluence/v1/page.proto</span><span class="tag">~12 lines</span></div>
           <div class="panel-body" style="padding:0;border:0">
 <pre style="border:0"><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
 <span class="k">package</span> coherence.ext.confluence.v1;
 
 <span class="k">import</span> <span class="s">"coherence/kernel/v1/kernel.proto"</span>;
 
-<span class="c">// Composition over inheritance: core не знает об этой таблице.</span>
+<span class="c">// Composition over inheritance: core does not know this table.</span>
 <span class="k">message</span> Page {
   coherence.kernel.v1.RecordMeta meta = 1;
   <span class="k">string</span> space_key   = 2;
@@ -620,7 +642,7 @@
 
       <section class="block" style="margin-top:22px">
         <div class="panel">
-          <div class="panel-head"><span>coherence/core/v1/core.proto</span><span class="tag">~90 строк · две колонки</span></div>
+          <div class="panel-head"><span>coherence/core/v1/core.proto</span><span class="tag">~90 lines · two columns</span></div>
           <div class="core-split">
 <pre><code><span class="k">syntax</span> = <span class="s">"proto3"</span>;
 <span class="k">package</span> coherence.core.v1;
@@ -661,9 +683,9 @@
   <span class="k">string</span> file_path      = 3;
   <span class="k">string</span> sha            = 4;
 }</code></pre>
-<pre><code><span class="c">// продолжение core.proto</span>
+<pre><code><span class="c">// core.proto continued</span>
 
-<span class="c">// Зарезервировано под SCIP; в слайсе не заполняется.</span>
+<span class="c">// Reserved for SCIP; not populated in the slice.</span>
 <span class="k">message</span> ScipSymbol {
   coherence.kernel.v1.RecordMeta meta = 1;
   <span class="k">string</span> code_file_id = 2;
@@ -680,7 +702,7 @@
   <span class="k">string</span> relation_kind  = 4;
 }
 
-<span class="c">// Run — это факт исполнения, а не объект каталога.</span>
+<span class="c">// Run is an execution fact, not a catalog object.</span>
 <span class="k">message</span> Run {
   <span class="k">string</span> id = 1;
   <span class="k">string</span> behavior = 2; <span class="c">// "run_tests"</span>
@@ -715,17 +737,17 @@
       </section>
 
       <section class="block">
-        <h2>Решения, которые делают схему маленькой</h2>
+        <h2>Decisions that keep the schema small</h2>
         <div class="panel">
           <div class="panel-body">
             <table>
-              <thead><tr><th>Решение</th><th>Почему</th></tr></thead>
+              <thead><tr><th>Decision</th><th>Why</th></tr></thead>
               <tbody>
-                <tr><td>Один <code>RecordMeta</code> на все таблицы</td><td>id / slug / title / description / status / время описываются один раз, а не в каждом message.</td></tr>
-                <tr><td>Один <code>Link</code> вместо edge-таблиц</td><td><code>verified_by</code>, <code>depends_on</code>, <code>persisted_to</code> — строки одного вида, без отдельных message на каждую связь.</td></tr>
-                <tr><td>Канонические имена — singular</td><td><code>type_from</code> / <code>type_to</code> совпадают с именами таблиц и message: <code>spec</code>, <code>acceptance_criterion</code>, <code>code_file</code>. Один словарь вместо двух.</td></tr>
-                <tr><td>Никакого <code>Any</code> и реестров</td><td>JSONL уже типизирован именем таблицы. Реестр kinds вернётся, когда появятся runtime-объекты третьих сторон.</td></tr>
-                <tr><td>Расширения — отдельные пакеты</td><td>Confluence/Jira добавляют таблицы и линкуются к core через <code>Link</code>. Core не меняется.</td></tr>
+                <tr><td>One <code>RecordMeta</code> for all tables</td><td>id / slug / title / description / status / time are described once, not in every message.</td></tr>
+                <tr><td>One <code>Link</code> instead of edge tables</td><td><code>verified_by</code>, <code>depends_on</code>, <code>persisted_to</code> — rows of one shape, without a separate message per relation.</td></tr>
+                <tr><td>Canonical names are singular</td><td><code>type_from</code> / <code>type_to</code> match table and message names: <code>spec</code>, <code>acceptance_criterion</code>, <code>code_file</code>. One vocabulary instead of two.</td></tr>
+                <tr><td>No <code>Any</code> and no registries</td><td>JSONL is already typed by table name. The kinds registry returns when third-party runtime objects appear.</td></tr>
+                <tr><td>Extensions are separate packages</td><td>Confluence/Jira add tables and link to core via <code>Link</code>. Core stays unchanged.</td></tr>
               </tbody>
             </table>
           </div>
@@ -734,7 +756,7 @@
 
       <section class="block">
         <div class="callout teal">
-          <p>Граница пакетов проверяема: <code>coherence.kernel.v1</code> не импортирует <code>coherence.core.v1</code>. Это правило уже зафиксировано в AGENTS.md и покрывается buf-плагином.</p>
+          <p>The package boundary is enforceable: <code>coherence.kernel.v1</code> does not import <code>coherence.core.v1</code>. This rule is already in AGENTS.md and enforced by the buf plugin.</p>
         </div>
       </section>
     </section>
@@ -743,16 +765,16 @@
     <section class="page" id="author" role="tabpanel" aria-labelledby="tab-author">
       <div class="stage-page-head">
         <div>
-          <p class="eyebrow"><span class="budget">≤ 1 страница</span> authoring</p>
+          <p class="eyebrow"><span class="budget">≤ 1 page</span> authoring</p>
           <h1>Author</h1>
         </div>
         <span class="chip teal">source of truth</span>
       </div>
-      <p class="lede">Спека и её критерии живут в версионированном JSONL. Это не база и не API — это diff-friendly файл в git.</p>
+      <p class="lede">The spec and its criteria live in versioned JSONL. Not a database, not an API — a diff-friendly file in git.</p>
 
       <section class="block">
-        <h2>Модель</h2>
-        <div class="model-line" aria-label="owner 1 к N spec 1 к N acceptance criterion">
+        <h2>Model</h2>
+        <div class="model-line" aria-label="owner 1 to N spec 1 to N acceptance criterion">
           <span class="ent pk">owner</span>
           <span class="rel">1<br>──<br>N</span>
           <span class="ent pk">spec</span>
@@ -761,7 +783,7 @@
         </div>
         <div class="cols tight" style="margin-top:20px">
           <div class="panel">
-            <div class="panel-head"><span>таблицы</span><span class="tag">columns</span></div>
+            <div class="panel-head"><span>tables</span><span class="tag">columns</span></div>
             <div class="panel-body">
               <table>
                 <thead><tr><th>table</th><th>columns</th></tr></thead>
@@ -797,11 +819,11 @@
       </section>
 
       <section class="block">
-        <h2>Результат</h2>
+        <h2>Result</h2>
         <div class="cols tight">
           <div>
             <div class="panel">
-              <div class="panel-head"><span>contracts.jsonl</span><span class="tag">одна строка = одна запись</span></div>
+              <div class="panel-head"><span>contracts.jsonl</span><span class="tag">one line = one record</span></div>
               <div class="panel-body" style="padding:0">
 <pre style="border:0"><code>{"table":"spec","id":"spec-001","slug":"specs-as-code","level":"module","status":"active","title":"Specs as code","description":"...","owner_id":"owner-001"}
 {"table":"acceptance_criterion","id":"ac-001","spec_id":"spec-001","slug":"ac-jsonl-roundtrip","status":"active","title":"JSONL roundtrip"}
@@ -811,10 +833,10 @@
           </div>
           <div>
             <ul class="rule-list">
-              <li><span class="mk">1</span><span>Детерминированный порядок: <code>(table, id)</code>. Diff читается, merge предсказуем.</span></li>
-              <li><span class="mk">2</span><span>Уникальность: <code>id</code> глобально, <code>slug</code> — в пределах таблицы.</span></li>
-              <li><span class="mk">3</span><span>Ссылки проверяются при чтении: <code>owner_id</code> и <code>spec_id</code> должны существовать.</span></li>
-              <li><span class="mk">4</span><span>Ошибки — список <code>{line, table, id, problem}</code> и exit code 1.</span></li>
+              <li><span class="mk">1</span><span>Deterministic order: <code>(table, id)</code>. Diffs are readable, merges are predictable.</span></li>
+              <li><span class="mk">2</span><span>Uniqueness: <code>id</code> globally, <code>slug</code> — within a table.</span></li>
+              <li><span class="mk">3</span><span>References are checked on read: <code>owner_id</code> and <code>spec_id</code> must exist.</span></li>
+              <li><span class="mk">4</span><span>Errors are a list of <code>{line, table, id, problem}</code> and exit code 1.</span></li>
             </ul>
           </div>
         </div>
@@ -822,7 +844,7 @@
 
       <section class="block">
         <div class="callout">
-          <p>Один файл — осознанный старт. Когда объём вырастет, разбиение на <code>contracts/spec.jsonl</code> и т.д. — механическая операция, схема не меняется.</p>
+          <p>One file is a deliberate start. As volume grows, splitting into <code>contracts/spec.jsonl</code> etc. is a mechanical operation; the schema does not change.</p>
         </div>
       </section>
     </section>
@@ -831,15 +853,15 @@
     <section class="page" id="ingest" role="tabpanel" aria-labelledby="tab-ingest">
       <div class="stage-page-head">
         <div>
-          <p class="eyebrow"><span class="budget">≤ 1 страница</span> ingestion</p>
+          <p class="eyebrow"><span class="budget">≤ 1 page</span> ingestion</p>
           <h1>Ingest</h1>
         </div>
         <span class="chip">idempotent</span>
       </div>
-      <p class="lede">Структура кода — это данные. Конфиг говорит, что читать; результат — строки code_* в том же JSONL.</p>
+      <p class="lede">Code structure is data. Config says what to read; the result is code_* rows in the same JSONL.</p>
 
       <section class="block">
-        <h2>Модель</h2>
+        <h2>Model</h2>
         <div class="model-line" aria-label="code_repo to repo_branch to code_file, optionally to scip_symbol and scip_link">
           <span class="ent">code_repo</span>
           <span class="arrow">→</span>
@@ -851,15 +873,15 @@
           <span class="arrow">⇢</span>
           <span class="ent">scip_link</span>
         </div>
-        <p class="small" style="margin-top:10px">Пунктир — зарезервированная часть, не блокирует слайс. Связи AC↔код в нём работают на уровне файлов.</p>
+        <p class="small" style="margin-top:10px">Dotted lines are reserved, they do not block the slice. AC↔code links work at file level there.</p>
       </section>
 
       <section class="block">
         <div class="cols tight">
           <div>
-            <h2>Конфиг</h2>
+            <h2>Config</h2>
             <div class="panel">
-              <div class="panel-head"><span>coherence.ingest.yaml</span><span class="tag">tool config, не proto</span></div>
+              <div class="panel-head"><span>coherence.ingest.yaml</span><span class="tag">tool config, not proto</span></div>
               <div class="panel-body" style="padding:0">
 <pre style="border:0"><code>repos:
   - path: .
@@ -899,18 +921,18 @@
       </section>
 
       <section class="block">
-        <h2>Результат</h2>
+        <h2>Result</h2>
         <div class="cols tight">
           <div class="panel">
             <div class="panel-head"><span>upsert semantics</span><span class="tag">deterministic</span></div>
             <div class="panel-body">
               <table>
-                <thead><tr><th>Событие</th><th>Действие</th></tr></thead>
+                <thead><tr><th>Event</th><th>Action</th></tr></thead>
                 <tbody>
-                  <tr><td>Файл появился</td><td>insert <code>code_file</code> со статусом <code>active</code></td></tr>
-                  <tr><td>sha изменился</td><td>update <code>sha</code>, <code>updated_at_unix_s</code></td></tr>
-                  <tr><td>Файл исчез</td><td><code>status=archived</code>, строку не удаляем</td></tr>
-                  <tr><td>Повторный ingest</td><td>ноль новых строк, если ничего не менялось</td></tr>
+                  <tr><td>File appeared</td><td>insert <code>code_file</code> with status <code>active</code></td></tr>
+                  <tr><td>sha changed</td><td>update <code>sha</code>, <code>updated_at_unix_s</code></td></tr>
+                  <tr><td>File disappeared</td><td><code>status=archived</code>, keep the row</td></tr>
+                  <tr><td>Repeated ingest</td><td>zero new rows if nothing changed</td></tr>
                 </tbody>
               </table>
             </div>
@@ -922,7 +944,7 @@
 elapsed    0.41s
 exit       0</code></pre>
             </div>
-            <p class="small" style="margin-top:14px">Ключ идентичности файла: <code>(repo.path, branch.name, file_path)</code>. Id — производный, поэтому повторный ingest не создаёт дублей.</p>
+            <p class="small" style="margin-top:14px">File identity key: <code>(repo.path, branch.name, file_path)</code>. Id is derived, so repeated ingest creates no duplicates.</p>
           </div>
         </div>
       </section>
@@ -932,15 +954,15 @@ exit       0</code></pre>
     <section class="page" id="link" role="tabpanel" aria-labelledby="tab-link">
       <div class="stage-page-head">
         <div>
-          <p class="eyebrow"><span class="budget">≤ 1 страница</span> linking</p>
+          <p class="eyebrow"><span class="budget">≤ 1 page</span> linking</p>
           <h1>Link</h1>
         </div>
         <span class="chip accent">generic join</span>
       </div>
-      <p class="lede">AC становится проверяемым критерием, когда указывает на код. Это ребро — строка таблицы <code>link</code>.</p>
+      <p class="lede">An AC becomes a verifiable criterion when it points at code. That edge is a row in the <code>link</code>.</p>
 
       <section class="block">
-        <h2>Модель</h2>
+        <h2>Model</h2>
         <div class="model-line">
           <span class="ent pk">acceptance_criterion</span>
           <span class="rel">verified_by →</span>
@@ -948,7 +970,7 @@ exit       0</code></pre>
         </div>
         <div class="cols tight" style="margin-top:20px">
           <div class="panel">
-            <div class="panel-head"><span>link columns</span><span class="tag">один shape на все связи</span></div>
+            <div class="panel-head"><span>link columns</span><span class="tag">one shape for all relations</span></div>
             <div class="panel-body">
               <table>
                 <thead><tr><th>field</th><th>example</th></tr></thead>
@@ -970,7 +992,7 @@ exit       0</code></pre>
                 <thead><tr><th>relation</th><th>from → to</th><th>behavior</th></tr></thead>
                 <tbody>
                   <tr><td class="mono">verified_by</td><td class="mono">ac → code_file</td><td><code>run_tests(files)</code></td></tr>
-                  <tr><td class="mono">depends_on</td><td class="mono">spec → spec</td><td>impact / ordering, не исполняется</td></tr>
+                  <tr><td class="mono">depends_on</td><td class="mono">spec → spec</td><td>impact / ordering, not executed</td></tr>
                   <tr><td class="mono">persisted_to</td><td class="mono">spec → confluence_page</td><td><code>upsert_page</code></td></tr>
                 </tbody>
               </table>
@@ -982,7 +1004,7 @@ exit       0</code></pre>
       <section class="block">
         <h2>Messages</h2>
         <div class="panel">
-          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">одна форма для всех рёбер</span></div>
+          <div class="panel-head"><span>coherence/kernel/v1/kernel.proto</span><span class="tag">one shape for all edges</span></div>
           <div class="panel-body" style="padding:0">
 <pre style="border:0"><code><span class="k">message</span> Link {
   <span class="k">string</span> id = 1;
@@ -1000,10 +1022,10 @@ exit       0</code></pre>
 
       <section class="block">
         <h2>Selection → run plan</h2>
-        <p>Выбор полностью детерминирован: никакого LLM в момент прогона. Агент может предлагать links, но выполняются только записанные рёбра.</p>
+        <p>Selection is fully deterministic: no LLM at run time. An agent may propose links, but only recorded edges execute.</p>
         <div class="cols tight">
           <div class="panel">
-            <div class="panel-head"><span>правило</span><span class="tag">verified_by</span></div>
+            <div class="panel-head"><span>rule</span><span class="tag">verified_by</span></div>
             <div class="panel-body" style="padding:0">
 <pre style="border:0"><code>links
   .where(relation_kind == <span class="s">"verified_by"</span>)
@@ -1029,7 +1051,7 @@ exit       0</code></pre>
 
       <section class="block">
         <div class="callout">
-          <p>AC с <code>status=archived</code> или link с <code>confidence&lt;1</code> не попадают в план автоматически. Их можно включить явным scope-фильтром.</p>
+          <p>ACs with <code>status=archived</code> or links with <code>confidence&lt;1</code> do not enter the plan automatically. They can be included with an explicit scope filter.</p>
         </div>
       </section>
     </section>
@@ -1038,15 +1060,15 @@ exit       0</code></pre>
     <section class="page" id="execute" role="tabpanel" aria-labelledby="tab-execute">
       <div class="stage-page-head">
         <div>
-          <p class="eyebrow"><span class="budget">≤ 1 страница</span> execution</p>
+          <p class="eyebrow"><span class="budget">≤ 1 page</span> execution</p>
           <h1>Execute</h1>
         </div>
         <span class="chip teal">behavior engine</span>
       </div>
-      <p class="lede">План превращается в артефакты. Behavior — это чистая функция от пары (link kind, target kind) и контекста окружения.</p>
+      <p class="lede">The plan becomes artifacts. A behavior is a pure function of (link kind, target kind) and environment context.</p>
 
       <section class="block">
-        <h2>Модель</h2>
+        <h2>Model</h2>
         <div class="panel">
           <div class="panel-body">
             <table>
@@ -1055,7 +1077,7 @@ exit       0</code></pre>
                 <tr><td class="mono">verified_by</td><td class="mono">code_file</td><td class="mono">local / ci</td><td><code>run_tests(files)</code></td></tr>
               </tbody>
             </table>
-            <p class="small" style="margin:12px 0 0">Один behavior в слайсе. Реестр поведений — точка расширения, а не часть контракта.</p>
+            <p class="small" style="margin:12px 0 0">One behavior in the slice. The behavior registry is an extension point, not part of the contract.</p>
           </div>
         </div>
       </section>
@@ -1098,7 +1120,7 @@ exit       0</code></pre>
       </section>
 
       <section class="block">
-        <h2>Результат</h2>
+        <h2>Result</h2>
         <div class="cols tight">
           <div>
             <div class="panel-head" style="border:1px solid var(--line-strong);border-bottom:0;background:var(--panel)"><span>artifact bundle</span><span class="tag">gitignored, inspectable</span></div>
@@ -1116,10 +1138,10 @@ exit       0</code></pre>
           </div>
           <div>
             <ul class="rule-list">
-              <li><span class="mk">→</span><span>Артефакты пишутся всегда, пока идёт прогон: их можно открыть руками.</span></li>
-              <li><span class="mk">→</span><span><code>--persist</code> управляет только публикацией: report-строки и внешние копии evidence.</span></li>
-              <li><span class="mk">→</span><span>Exit code: <code>0</code> — все ok/skipped, <code>1</code> — есть failed.</span></li>
-              <li><span class="mk">→</span><span>Каждый RunItem ссылается на исходный <code>link_id</code> — провенанс не теряется.</span></li>
+              <li><span class="mk">→</span><span>Artifacts are always written while a run is in progress: you can open them by hand.</span></li>
+              <li><span class="mk">→</span><span><code>--persist</code> controls publication only: report rows and external evidence copies.</span></li>
+              <li><span class="mk">→</span><span>Exit code: <code>0</code> — all ok/skipped, <code>1</code> — any failed.</span></li>
+              <li><span class="mk">→</span><span>Each RunItem references the original <code>link_id</code> — provenance is not lost.</span></li>
             </ul>
           </div>
         </div>
@@ -1130,27 +1152,27 @@ exit       0</code></pre>
     <section class="page" id="report" role="tabpanel" aria-labelledby="tab-report">
       <div class="stage-page-head">
         <div>
-          <p class="eyebrow"><span class="budget">≤ 1 страница</span> reporting</p>
+          <p class="eyebrow"><span class="budget">≤ 1 page</span> reporting</p>
           <h1>Report</h1>
         </div>
         <span class="chip accent">human + agent signal</span>
       </div>
-      <p class="lede">Отчёт — это не дамп логов, а минимальный набор сигналов: какой AC сломан, где код, что ожидалось, как повторить.</p>
+      <p class="lede">A report is not a log dump but a minimal set of signals: which AC broke, where the code is, what was expected, how to reproduce.</p>
 
       <section class="block">
-        <h2>Модель</h2>
+        <h2>Model</h2>
         <div class="panel">
-          <div class="panel-head"><span>run_tests_report</span><span class="tag">строка на RunItem</span></div>
+          <div class="panel-head"><span>run_tests_report</span><span class="tag">one row per RunItem</span></div>
           <div class="panel-body" style="padding:0">
             <table>
               <thead><tr><th>field</th><th>meaning</th></tr></thead>
               <tbody>
-                <tr><td class="mono">run_id</td><td>какой прогон</td></tr>
-                <tr><td class="mono">link_id</td><td>какое ребро проверялось</td></tr>
-                <tr><td class="mono">acceptance_criterion_id</td><td>какой AC</td></tr>
-                <tr><td class="mono">code_file_id</td><td>какой файл исполнялся</td></tr>
-                <tr><td class="mono">expected / actual</td><td>ожидание и факт</td></tr>
-                <tr><td class="mono">reason</td><td>почему failed/skipped</td></tr>
+                <tr><td class="mono">run_id</td><td>which run</td></tr>
+                <tr><td class="mono">link_id</td><td>which edge was checked</td></tr>
+                <tr><td class="mono">acceptance_criterion_id</td><td>which AC</td></tr>
+                <tr><td class="mono">code_file_id</td><td>which file was executed</td></tr>
+                <tr><td class="mono">expected / actual</td><td>expected and actual</td></tr>
+                <tr><td class="mono">reason</td><td>why failed/skipped</td></tr>
                 <tr><td class="mono">status</td><td><code>ok</code> · <code>failed</code> · <code>skipped</code></td></tr>
               </tbody>
             </table>
@@ -1159,9 +1181,9 @@ exit       0</code></pre>
       </section>
 
       <section class="block">
-        <h2>Результат</h2>
+        <h2>Result</h2>
         <div class="panel">
-          <div class="panel-head"><span>report.json</span><span class="tag">строка на RunItem</span></div>
+          <div class="panel-head"><span>report.json</span><span class="tag">one row per RunItem</span></div>
           <div class="panel-body" style="padding:0">
 <pre style="border:0"><code>{
   "run_id": "run-1763550000",
@@ -1181,22 +1203,22 @@ exit       0</code></pre>
         <h2>Progressive disclosure</h2>
         <div class="cols tight">
           <ol class="rule-list" style="counter-reset:none">
-            <li><span class="mk">1</span><span>Сломанный AC: текст и id. Самое важное — первым.</span></li>
-            <li><span class="mk">2</span><span>Файл и диапазон строк; сниппет под спойлером.</span></li>
-            <li><span class="mk">3</span><span>Контекст: соседние символы, другие файлы, соседние AC — свёрнуто.</span></li>
-            <li><span class="mk">4</span><span>Воспроизведение: screenshot / recording / trace + команда re-run.</span></li>
+            <li><span class="mk">1</span><span>Broken AC: text and id. Most important first.</span></li>
+            <li><span class="mk">2</span><span>File and line range; snippet behind a spoiler.</span></li>
+            <li><span class="mk">3</span><span>Context: neighboring symbols, other files, neighboring ACs — collapsed.</span></li>
+            <li><span class="mk">4</span><span>Reproduction: screenshot / recording / trace + re-run command.</span></li>
           </ol>
           <div class="callout amber">
-            <p><b>Принцип:</b> отчёт должен читаться за 30 секунд, а раскрываться до полного debug-контекста только по запросу. Evidence пре-процессится под эти четыре уровня.</p>
+            <p><b>Principle:</b> the report should read in 30 seconds and expand to full debug context only on demand. Evidence is pre-processed into these four levels.</p>
           </div>
         </div>
       </section>
 
       <section class="block">
         <h2>Persist policy</h2>
-        <p>Один и тот же прогон ведёт себя по-разному в зависимости от контекста и флага. Переключи:</p>
+        <p>The same run behaves differently depending on context and flag. Toggle:</p>
         <div class="switch-row">
-          <div class="seg" role="radiogroup" aria-label="Контекст">
+          <div class="seg" role="radiogroup" aria-label="Context">
             <label><input type="radio" name="ctx" value="local" checked><span>local</span></label>
             <label><input type="radio" name="ctx" value="ci"><span>ci</span></label>
           </div>
@@ -1207,17 +1229,17 @@ exit       0</code></pre>
         <div class="panel">
           <div class="panel-body" style="padding:0">
             <table id="persist-matrix">
-              <thead><tr><th>Что</th><th>local</th><th>ci</th><th>+ --persist</th></tr></thead>
+              <thead><tr><th>What</th><th>local</th><th>ci</th><th>+ --persist</th></tr></thead>
               <tbody>
-                <tr><td>artifact bundle в <code>run/</code></td><td data-col="local">да</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
-                <tr><td>report-строки в contracts.jsonl</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
-                <tr><td>внешние копии evidence</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
-                <tr><td>PR comment / статус</td><td data-col="local">нет</td><td data-col="ci">да</td><td data-col="force">да</td></tr>
+                <tr><td>artifact bundle in <code>run/</code></td><td data-col="local">yes</td><td data-col="ci">yes</td><td data-col="force">yes</td></tr>
+                <tr><td>report rows in contracts.jsonl</td><td data-col="local">no</td><td data-col="ci">yes</td><td data-col="force">yes</td></tr>
+                <tr><td>external evidence copies</td><td data-col="local">no</td><td data-col="ci">yes</td><td data-col="force">yes</td></tr>
+                <tr><td>PR comment / status</td><td data-col="local">no</td><td data-col="ci">yes</td><td data-col="force">yes</td></tr>
               </tbody>
             </table>
           </div>
         </div>
-        <p class="small" style="margin-top:12px" id="persist-hint">local по умолчанию: артефакты лежат рядом, но ничего не публикуется.</p>
+        <p class="small" style="margin-top:12px" id="persist-hint">local default: artifacts sit nearby, but nothing is published.</p>
       </section>
 
       <section class="block">
@@ -1229,7 +1251,7 @@ exit       0</code></pre>
           <span class="arrow">⇒</span>
           <span class="mono" style="color:var(--muted)">upsert_page(spec)</span>
         </div>
-        <p class="small" style="margin-top:12px">Публикация не добавляет полей в <code>Spec</code>. Она добавляет таблицу расширения и ребро. Тот же паттерн — Jira, GitHub, HTML-сайт.</p>
+        <p class="small" style="margin-top:12px">Publishing does not add fields to <code>Spec</code>. It adds an extension table and an edge. Same pattern: Jira, GitHub, HTML site.</p>
       </section>
     </section>
 
@@ -1251,6 +1273,8 @@ exit       0</code></pre>
         t.tabIndex = selected ? 0 : -1;
       });
       if (pushHash && location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+      const langLink = document.querySelector('a.lang[data-base]');
+      if (langLink) langLink.href = langLink.dataset.base + '#' + id;
       window.scrollTo(0, 0);
     }
 
@@ -1289,11 +1313,11 @@ exit       0</code></pre>
       });
 
       if (force) {
-        hint.innerHTML = '<code>--persist</code> включён: report-строки и внешние копии evidence публикуются в любом контексте.';
+        hint.innerHTML = '<code>--persist</code> is on: report rows and external evidence copies are published in any context.';
       } else if (ctx === 'ci') {
-        hint.innerHTML = 'ci по умолчанию: отчёт и evidence публикуются, PR получает статус.';
+        hint.innerHTML = 'ci default: the report and evidence are published, the PR gets a status.';
       } else {
-        hint.innerHTML = 'local по умолчанию: артефакты лежат рядом, но ничего не публикуется.';
+        hint.innerHTML = 'local default: artifacts sit nearby, but nothing is published.';
       }
     }
     ctxRadios.forEach(r => r.addEventListener('change', render));
