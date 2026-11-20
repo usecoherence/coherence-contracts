@@ -1,0 +1,14 @@
+{{ $current := . }}
+{{ $translations := .AllTranslations }}
+<div class="lang-row" aria-label="{{ i18n "language" }}">
+  {{ range $i, $lang := hugo.Sites }}
+    {{ if $i }}<span class="lang-sep">/</span>{{ end }}
+    {{ with index (where $translations "Language.Lang" $lang.Language.Lang) 0 }}
+      {{ if eq .Language.Lang $current.Language.Lang }}
+        <span class="lang-current">{{ $lang.Language.Label }}</span>
+      {{ else }}
+        <a class="lang" href="{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}" lang="{{ .Language.Lang }}">{{ $lang.Language.Label }}</a>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+</div>

@@ -1,0 +1,2 @@
+{{ $type := .Get "type" | default "" }}
+<div class="callout {{ $type }}">{{ .Inner | markdownify }}</div>

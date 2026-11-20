@@ -1,0 +1,88 @@
+baseURL = "https://usecoherence.github.io/coherence-contracts/"
+title = "Coherence Contracts"
+locale = "en"
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term", "rss"]
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  style = "github"
+  noClasses = false
+
+[languages]
+  [languages.en]
+    label = "EN"
+    locale = "en"
+    weight = 1
+    contentDir = "content/en"
+
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        name = "Overview"
+        pageRef = "/"
+        weight = 1
+      [[languages.en.menu.main]]
+        name = "Schema"
+        pageRef = "/schema/"
+        weight = 2
+      [[languages.en.menu.main]]
+        name = "Author"
+        pageRef = "/author/"
+        weight = 3
+      [[languages.en.menu.main]]
+        name = "Ingest"
+        pageRef = "/ingest/"
+        weight = 4
+      [[languages.en.menu.main]]
+        name = "Link"
+        pageRef = "/link/"
+        weight = 5
+      [[languages.en.menu.main]]
+        name = "Execute"
+        pageRef = "/execute/"
+        weight = 6
+      [[languages.en.menu.main]]
+        name = "Report"
+        pageRef = "/report/"
+        weight = 7
+
+  [languages.ru]
+    label = "RU"
+    locale = "ru"
+    weight = 2
+    contentDir = "content/ru"
+    title = "Контракты Coherence"
+
+    [languages.ru.menu]
+      [[languages.ru.menu.main]]
+        name = "Обзор"
+        pageRef = "/"
+        weight = 1
+      [[languages.ru.menu.main]]
+        name = "Схема"
+        pageRef = "/schema/"
+        weight = 2
+      [[languages.ru.menu.main]]
+        name = "Author"
+        pageRef = "/author/"
+        weight = 3
+      [[languages.ru.menu.main]]
+        name = "Ingest"
+        pageRef = "/ingest/"
+        weight = 4
+      [[languages.ru.menu.main]]
+        name = "Link"
+        pageRef = "/link/"
+        weight = 5
+      [[languages.ru.menu.main]]
+        name = "Execute"
+        pageRef = "/execute/"
+        weight = 6
+      [[languages.ru.menu.main]]
+        name = "Report"
+        pageRef = "/report/"
+        weight = 7

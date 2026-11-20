@@ -1,0 +1,53 @@
+<div class="persist-demo"
+     data-hint-local="{{ i18n "persist_hint_local" }}"
+     data-hint-ci="{{ i18n "persist_hint_ci" }}"
+     data-hint-force="{{ i18n "persist_hint_force" }}">
+  <div class="switch-row">
+    <div class="seg" role="radiogroup" aria-label="{{ i18n "persist_context" }}">
+      <label><input type="radio" name="ctx" value="local" checked><span>{{ i18n "persist_local" }}</span></label>
+      <label><input type="radio" name="ctx" value="ci"><span>{{ i18n "persist_ci" }}</span></label>
+    </div>
+    <div class="seg">
+      <label><input type="checkbox" class="persist-flag"><span>--persist</span></label>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-body" style="padding:0">
+      <table class="persist-matrix">
+        <thead><tr>
+          <th>{{ i18n "persist_what" }}</th>
+          <th>{{ i18n "persist_local" }}</th>
+          <th>{{ i18n "persist_ci" }}</th>
+          <th>+ --persist</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>{{ i18n "persist_artifact_bundle" }}</td>
+            <td data-col="local">{{ i18n "persist_yes" }}</td>
+            <td data-col="ci">{{ i18n "persist_yes" }}</td>
+            <td data-col="force">{{ i18n "persist_yes" }}</td>
+          </tr>
+          <tr>
+            <td>{{ i18n "persist_report_rows" }}</td>
+            <td data-col="local">{{ i18n "persist_no" }}</td>
+            <td data-col="ci">{{ i18n "persist_yes" }}</td>
+            <td data-col="force">{{ i18n "persist_yes" }}</td>
+          </tr>
+          <tr>
+            <td>{{ i18n "persist_external" }}</td>
+            <td data-col="local">{{ i18n "persist_no" }}</td>
+            <td data-col="ci">{{ i18n "persist_yes" }}</td>
+            <td data-col="force">{{ i18n "persist_yes" }}</td>
+          </tr>
+          <tr>
+            <td>{{ i18n "persist_pr" }}</td>
+            <td data-col="local">{{ i18n "persist_no" }}</td>
+            <td data-col="ci">{{ i18n "persist_yes" }}</td>
+            <td data-col="force">{{ i18n "persist_yes" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="small persist-hint">{{ i18n "persist_hint_local" }}</p>
+</div>

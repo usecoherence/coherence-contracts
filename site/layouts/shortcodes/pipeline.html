@@ -1,0 +1,17 @@
+{{ $stages := slice
+  (dict "num" "01" "name" "Author"  "what" (i18n "stage_author_what"))
+  (dict "num" "02" "name" "Ingest"  "what" (i18n "stage_ingest_what"))
+  (dict "num" "03" "name" "Link"    "what" (i18n "stage_link_what"))
+  (dict "num" "04" "name" "Select"  "what" (i18n "stage_select_what"))
+  (dict "num" "05" "name" "Execute" "what" (i18n "stage_execute_what"))
+  (dict "num" "06" "name" "Report"  "what" (i18n "stage_report_what"))
+}}
+<div class="pipe" role="img" aria-label="{{ i18n "flow" }}">
+  {{ range $stages }}
+    <div class="stage">
+      <span class="s-num">{{ .num }}</span>
+      <span class="s-name">{{ .name }}</span>
+      <span class="s-what">{{ .what }}</span>
+    </div>
+  {{ end }}
+</div>

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+  <link rel="canonical" href="{{ .Permalink }}">
+  <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+  {{ range .AllTranslations }}<link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
+  {{ end }}<link rel="stylesheet" href="{{ "css/site.css" | relURL }}">
+</head>
+<body>
+  <a class="skip" href="#main">{{ i18n "skip_to_content" }}</a>
+  <div class="shell">
+    {{ partial "rail.html" . }}
+    <main id="main"><article class="page">{{ block "main" . }}{{ end }}</article></main>
+  </div>
+  <script src="{{ "js/site.js" | relURL }}" defer></script>
+</body>
+</html>

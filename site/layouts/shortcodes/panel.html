@@ -1,0 +1,9 @@
+{{ $title := .Get "title" }}
+{{ $tag := .Get "tag" }}
+<div class="panel">
+  <div class="panel-head">
+    <span>{{ $title }}</span>
+    {{ with $tag }}<span class="tag">{{ . }}</span>{{ end }}
+  </div>
+  <div class="panel-body">{{ .Inner | markdownify }}</div>
+</div>

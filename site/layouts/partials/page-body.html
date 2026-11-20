@@ -1,0 +1,17 @@
+{{ $heading := .Params.heading | default .Title }}
+{{ if or .Params.eyebrow .Params.badge }}
+  <div class="stage-page-head">
+    <div>
+      <p class="eyebrow">
+        {{ with .Params.budget }}<span class="budget">{{ . }}</span>{{ end }}
+        {{ with .Params.eyebrow }}{{ . }}{{ end }}
+      </p>
+      <h1>{{ $heading }}</h1>
+    </div>
+    {{ with .Params.badge }}<span class="chip {{ $.Params.badgeClass }}">{{ . }}</span>{{ end }}
+  </div>
+{{ else }}
+  <p class="eyebrow">{{ with .Params.budget }}<span class="budget">{{ . }}</span>{{ end }}</p>
+  <h1>{{ $heading }}</h1>
+{{ end }}
+{{ .Content }}

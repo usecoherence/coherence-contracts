@@ -1,0 +1,25 @@
+<aside class="rail">
+  <div class="brand">
+    <span class="mark">Coherence / contract</span>
+    <span class="name">{{ site.Title }}</span>
+    <span class="sub">draft v0 · {{ i18n "vertical_slice" }}</span>
+    {{ partial "lang-switch.html" . }}
+  </div>
+
+  <nav aria-label="{{ i18n "sections" }}">
+    {{ $current := . }}
+    {{ range site.Menus.main }}
+      {{ $active := or ($current.IsMenuCurrent "main" .) ($current.HasMenuCurrent "main" .) }}
+      <a href="{{ .URL }}"{{ if $active }} aria-current="page"{{ end }}>
+        <span class="num">{{ printf "%02d" .Weight }}</span>{{ .Name }}
+      </a>
+    {{ end }}
+  </nav>
+
+  <div class="rail-note">
+    {{ i18n "source_of_truth" }}<br>
+    <span style="color:var(--teal)">contracts.jsonl</span> {{ i18n "git_tracked" }}<br>
+    {{ i18n "artifacts" }}<br>
+    <span style="color:var(--amber)">run/{ts}-{behavior}/</span> {{ i18n "gitignored" }}
+  </div>
+</aside>
